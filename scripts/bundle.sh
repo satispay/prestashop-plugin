@@ -1,7 +1,10 @@
 rm -rf .tmp
-mkdir .tmp && mkdir .tmp/satispay
-cp -R code/* .tmp/satispay
-cd .tmp && zip -r archive.zip satispay
-cd ..
-mv .tmp/archive.zip ../../.bundles/prestashop.zip
-# rm -rf .tmp
+mkdir -p .tmp/satispay
+cp -R controllers .tmp/satispay
+cp -R includes .tmp/satispay
+cp -R translations .tmp/satispay
+cp -R views .tmp/satispay
+cp -R index.php .tmp/satispay
+cp -R logo.png .tmp/satispay
+cp -R satispay.php .tmp/satispay
+(cd .tmp && zip -r archive.zip satispay)

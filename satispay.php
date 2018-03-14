@@ -38,7 +38,7 @@ class Satispay extends PaymentModule
     {
         $this->name = 'satispay';
         $this->tab = 'payments_gateways';
-        $this->version = '1.4.2';
+        $this->version = '1.4.3';
         $this->author = 'Satispay';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -52,7 +52,7 @@ class Satispay extends PaymentModule
 
         $this->limited_currencies = array('EUR');
 
-        $this->ps_versions_compliancy = array('min' => '1.5', 'max' => _PS_VERSION_);
+        $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
 
         \SatispayOnline\Api::setSecurityBearer(Configuration::get('SATISPAY_SECURITY_BEARER'));
         \SatispayOnline\Api::setStaging(Configuration::get('SATISPAY_STAGING'));
@@ -67,26 +67,6 @@ class Satispay extends PaymentModule
     {
         Configuration::updateValue('SATISPAY_STAGING', false);
         Configuration::updateValue('SATISPAY_SECURITY_BEARER', null);
-
-        // if (!Configuration::get('SATISPAY_WAITING')) {
-        //     $order_state = new OrderState();
-        //     $order_state->name = array();
-        //     foreach (Language::getLanguages() as $language) {
-        //         if (Tools::strtolower($language['iso_code']) === 'it') {
-        //             $order_state->name[$language['id_lang']] = 'In attesa di Satispay';
-        //         } else {
-        //             $order_state->name[$language['id_lang']] = 'Awaiting for Satispay';
-        //         }
-        //     }
-        //     $order_state->send_email = false;
-        //     $order_state->color = '#4169E1';
-        //     $order_state->hidden = false;
-        //     $order_state->delivery = false;
-        //     $order_state->logable = false;
-        //     $order_state->invoice = false;
-        //     $order_state->add();
-        //     Configuration::updateValue('SATISPAY_WAITING', (int) $order_state->id);
-        // }
 
         return parent::install() &&
             $this->registerHook('payment') &&

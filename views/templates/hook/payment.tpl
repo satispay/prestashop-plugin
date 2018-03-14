@@ -1,5 +1,5 @@
 {*
-* 2007-2017 PrestaShop
+* 2007-2018 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,16 +18,36 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author    PrestaShop SA <contact@prestashop.com>
-*  @copyright 2007-2017 PrestaShop SA
+*  @copyright 2007-2018 PrestaShop SA
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
+<style>
+p.payment_module a.satispay {
+	background: url('{$module_dir|escape:'htmlall':'UTF-8'}logo.png') 15px 15px no-repeat #fbfbfb;
+	background-size: 61px;
+}
+
+p.payment_module a.satispay:after {
+	display: block;
+	content: "\f054";
+	position: absolute;
+	right: 15px;
+	margin-top: -11px;
+	top: 50%;
+	font-family: "FontAwesome";
+	font-size: 25px;
+	height: 22px;
+	width: 14px;
+	color: #777;
+}
+</style>
+
 <div class="row">
-	<div class="col-xs-12 col-md-6">
-		<p class="payment_module" id="satispay_payment_button">
-			<a href="{$link->getModuleLink('satispay', 'payment', array(), true)|escape:'htmlall':'UTF-8'}" title="{l s='Satispay' mod='satispay'}">
-				<img src="{$module_dir|escape:'htmlall':'UTF-8'}/logo.png" alt="{l s='Satispay' mod='satispay'}" width="32" height="32" />
+	<div class="col-xs-12">
+		<p class="payment_module">
+			<a class="satispay" href="{$link->getModuleLink('satispay', 'payment', array(), true)|escape:'htmlall':'UTF-8'}" title="{l s='Satispay' mod='satispay'}">
 				{l s='Satispay' mod='satispay'}
 			</a>
 		</p>
