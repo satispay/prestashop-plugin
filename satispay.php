@@ -38,7 +38,7 @@ class Satispay extends PaymentModule
     {
         $this->name = 'satispay';
         $this->tab = 'payments_gateways';
-        $this->version = '1.4.3';
+        $this->version = '1.4.4';
         $this->author = 'Satispay';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -52,7 +52,7 @@ class Satispay extends PaymentModule
 
         $this->limited_currencies = array('EUR');
 
-        $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
+        $this->ps_versions_compliancy = array('min' => '1.5', 'max' => _PS_VERSION_);
 
         \SatispayOnline\Api::setSecurityBearer(Configuration::get('SATISPAY_SECURITY_BEARER'));
         \SatispayOnline\Api::setStaging(Configuration::get('SATISPAY_STAGING'));
@@ -90,7 +90,12 @@ class Satispay extends PaymentModule
         $this->context->smarty->assign('module_dir', $this->_path);
         $output = $this->context->smarty->fetch($this->local_path.'views/templates/admin/configure.tpl');
 
-        return $output.$this->renderForm($postProcessResult);
+        if (_PS_VERSION_ < 1.6) {
+            $form = $this->context->smarty->fetch($this->local_path.'views/templates/admin/form-ps15.tpl');
+            return $output.$form;
+        } else {
+            return $output.$this->renderForm($postProcessResult);
+        }
     }
 
     protected function renderForm($postProcessResult)
@@ -220,7 +225,7 @@ class Satispay extends PaymentModule
 
             $refund_amount = Tools::getValue('SATISPAY_REFUND_AMOUNT');
             if (empty($refund_amount)) {
-                $refund_amount = $order->total_products_wt;
+                $refund_amount = $order->total_paid_tax_incl;
             }
 
             $currency = new Currency($order->id_currency);
@@ -235,10 +240,8 @@ class Satispay extends PaymentModule
             } catch (\Exception $ex) {
                 return 'Satispay Error '.$ex->getCode().': '.$ex->getMessage();
             }
-    
-            if ($refund_amount === $order->total_products_wt) {
-                $order->setCurrentState(7);
-            }
+
+            $order->setCurrentState(7);
 
             return array(
                 'success' => true,
@@ -267,7 +270,11 @@ class Satispay extends PaymentModule
         }
 
         $this->smarty->assign('module_dir', $this->_path);
-        return $this->display(__FILE__, 'views/templates/hook/payment.tpl');
+        if (_PS_VERSION_ < 1.6) {
+            return $this->display(__FILE__, 'views/templates/hook/payment-ps15.tpl');
+        } else {
+            return $this->display(__FILE__, 'views/templates/hook/payment.tpl');
+        }
     }
 
     public function hookPaymentOptions($params)
