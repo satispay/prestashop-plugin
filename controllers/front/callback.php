@@ -48,5 +48,6 @@ class SatispayCallbackModuleFrontController extends ModuleFrontController
                 $customer->secure_key
             );
         }
+        exit;
     }
 }
