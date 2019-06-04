@@ -1,1 +1,1 @@
-# Satispay Prestashop Plugin
+# Satispay PrestaShop Plugin

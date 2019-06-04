@@ -1,5 +1,6 @@
-{*
-* 2007-2018 PrestaShop
+<?php
+/**
+* 2007-2019 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -18,14 +19,23 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author    PrestaShop SA <contact@prestashop.com>
-*  @copyright 2007-2018 PrestaShop SA
+*  @copyright 2007-2019 PrestaShop SA
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
-*}
+*/
 
-<p class="payment_module">
-	<a href="{$link->getModuleLink('satispay', 'payment', array(), true)|escape:'htmlall':'UTF-8'}" title="{l s='Satispay' mod='satispay'}">
-		<img src="{$module_dir|escape:'htmlall':'UTF-8'}logo.png" alt="{l s='Satispay' mod='satispay'}" height="49" />
-		{l s='Satispay' mod='satispay'}
-	</a>
-</p>
+namespace SatispayGBusiness;
+
+class Consumer {
+  private static $apiPath = "/g_business/v1/consumers";
+
+  /**
+   * Get consumer
+   * @param string $phoneNumber
+  */
+  public static function get($phoneNumber) {
+    return Request::get(self::$apiPath."/$phoneNumber", array(
+      "sign" => true
+    ));
+  }
+}

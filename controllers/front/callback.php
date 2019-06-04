@@ -1,6 +1,6 @@
 <?php
 /**
-* 2007-2017 PrestaShop
+* 2007-2019 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,35 +19,28 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author    PrestaShop SA <contact@prestashop.com>
-*  @copyright 2007-2017 PrestaShop SA
+*  @copyright 2007-2019 PrestaShop SA
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
-
-require_once(dirname(__FILE__).'/../../includes/online-api-php-sdk/init.php');
 
 class SatispayCallbackModuleFrontController extends ModuleFrontController
 {
     public function postProcess()
     {
-        $charge = \SatispayOnline\Charge::get(Tools::getValue('charge_id'));
-        if ($charge->status === 'SUCCESS') {
-            $cart = new Cart($charge->metadata->cart_id);
+        $paymentId = Tools::getValue('payment_id');
+        $payment = \SatispayGBusiness\Payment::get($paymentId);
+
+        if ($payment->status == 'ACCEPTED') {
+            $cart = new Cart($payment->metadata->cart_id);
             $customer = new Customer($cart->id_customer);
-            $this->context->controller->module->validateOrder(
-                $cart->id,
-                2,
-                $charge->amount / 100,
-                $this->context->controller->module->displayName,
-                null,
-                array(
-                    'transaction_id' => $charge->id
-                ),
-                null,
-                null,
-                $customer->secure_key
-            );
+            $currency = new Currency($cart->id_currency);
+
+            $this->module->validateOrder($cart->id, 2, $payment->amount_unit / 100, $this->module->displayName, null, array(
+                'transaction_id' => $payment->id,
+            ), $currency->id, false, $customer->secure_key);
         }
+
         exit;
     }
 }

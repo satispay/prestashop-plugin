@@ -1,6 +1,6 @@
 <?php
 /**
-* 2007-2017 PrestaShop
+* 2007-2019 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,15 +19,13 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author    PrestaShop SA <contact@prestashop.com>
-*  @copyright 2007-2017 PrestaShop SA
+*  @copyright 2007-2019 PrestaShop SA
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
-require_once(dirname(__FILE__) . '/lib/Api.php');
+require_once(dirname(__FILE__) . "/lib/Api.php");
 
-require_once(dirname(__FILE__) . '/lib/Bearer.php');
-require_once(dirname(__FILE__) . '/lib/Charge.php');
-require_once(dirname(__FILE__) . '/lib/Checkout.php');
-require_once(dirname(__FILE__) . '/lib/Refund.php');
-require_once(dirname(__FILE__) . '/lib/User.php');
+require_once(dirname(__FILE__) . "/lib/Payment.php");
+require_once(dirname(__FILE__) . "/lib/Request.php");
+require_once(dirname(__FILE__) . "/lib/Consumer.php");

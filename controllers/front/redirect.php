@@ -1,6 +1,6 @@
 <?php
 /**
-* 2007-2017 PrestaShop
+* 2007-2019 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,44 +19,49 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author    PrestaShop SA <contact@prestashop.com>
-*  @copyright 2007-2017 PrestaShop SA
+*  @copyright 2007-2019 PrestaShop SA
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
-
-require_once(dirname(__FILE__).'/../../includes/online-api-php-sdk/init.php');
 
 class SatispayRedirectModuleFrontController extends ModuleFrontController
 {
     public function postProcess()
     {
-        $charge = \SatispayOnline\Charge::get(Tools::getValue('charge_id'));
-        if ($charge->status === 'SUCCESS') {
-            for ($i = 1; $i <= 4; $i++) {
-                $order = new Order(Order::getOrderByCartId($charge->metadata->cart_id));
-                if (empty($order->id)) {
-                    sleep(2);
-                } else {
-                    if ($this->context->customer->id != $order->id_customer) {
-                        exit;
-                    }
+        $paymentId = Tools::getValue('payment_id');
+        $payment = \SatispayGBusiness\Payment::get($paymentId);
+
+        if ($payment->status == 'ACCEPTED') {
+            for ($i = 0; $i < 6; $i++) {
+                $orderId = Order::getOrderByCartId($payment->metadata->cart_id);
+                $order = new Order($orderId);
+                
+                if (!empty($order->id)) {
                     $customer = new Customer($order->id_customer);
-                    Tools::redirect($this->context->link->getPageLink('order-confirmation', true, null, array(
-                        'id_cart' => $charge->metadata->cart_id,
+
+                    $confirmationLink = $this->context->link->getPageLink('order-confirmation', true, null, array(
+                        'id_cart' => $payment->metadata->cart_id,
                         'id_order' => $order->id,
-                        'id_module' => $this->context->controller->module->id,
+                        'id_module' => $this->module->id,
                         'key' => $customer->secure_key
-                    )));
+                    ));
+
+                    Tools::redirect($confirmationLink);
+                } else {
+                    sleep(2);
                 }
             }
 
-            Tools::redirect($this->context->link->getPageLink('order', true, null, array(
-                'step' => 3
-            )));
+            // TODO: error page
+            $historyLink = $this->context->link->getPageLink('history', true, null);
+            Tools::redirect($historyLink);
         } else {
-            Tools::redirect($this->context->link->getPageLink('order', true, null, array(
-                'step' => 3
-            )));
+            \SatispayGBusiness\Payment::update($payment->id, array(
+                'action' => 'CANCEL'
+            ));
+
+            $orderLink = $this->context->link->getPageLink('order', true, null);
+            Tools::redirect($orderLink);
         }
     }
 }

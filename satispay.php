@@ -1,6 +1,6 @@
 <?php
 /**
-* 2007-2017 PrestaShop
+* 2007-2019 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -19,16 +19,16 @@
 * needs please refer to http://www.prestashop.com for more information.
 *
 *  @author    PrestaShop SA <contact@prestashop.com>
-*  @copyright 2007-2017 PrestaShop SA
+*  @copyright 2007-2019 PrestaShop SA
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
+require_once(dirname(__FILE__).'/satispay-sdk/init.php');
+
 if (!defined('_PS_VERSION_')) {
     exit;
 }
-
-require_once(dirname(__FILE__).'/includes/online-api-php-sdk/init.php');
 
 class Satispay extends PaymentModule
 {
@@ -38,36 +38,37 @@ class Satispay extends PaymentModule
     {
         $this->name = 'satispay';
         $this->tab = 'payments_gateways';
-        $this->version = '1.4.5';
+        $this->version = '1.5.0';
         $this->author = 'Satispay';
-        $this->need_instance = 0;
-        $this->bootstrap = true;
+        $this->need_instance = 1;
         $this->module_key = '812ed8ea2509dd2146ef979a6af24ee5';
+        $this->bootstrap = true;
 
         parent::__construct();
 
         $this->displayName = $this->l('Satispay');
-        $this->description = $this
-            ->l('Satispay is a new payment system that allows you to pay stores or friends from your smartphone');
-
+        $this->description = $this->l('With Satispay you can send money to friends and pay in stores from your phone. Free, simple, secure! #doitsmart');
         $this->limited_currencies = array('EUR');
+        $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
 
-        $this->ps_versions_compliancy = array('min' => '1.5', 'max' => _PS_VERSION_);
+        $this->loadConfiguration();
+    }
 
-        \SatispayOnline\Api::setSecurityBearer(Configuration::get('SATISPAY_SECURITY_BEARER'));
-        \SatispayOnline\Api::setStaging(Configuration::get('SATISPAY_STAGING'));
+    protected function loadConfiguration()
+    {
+        $currentSandbox = Configuration::get('SATISPAY_SANDBOX', false);
+        $currentKeyId = Configuration::get('SATISPAY_KEY_ID', '');
+        $currentPrivateKey = Configuration::get('SATISPAY_PRIVATE_KEY', '');
+        $currentPublicKey = Configuration::get('SATISPAY_PUBLIC_KEY', '');
 
-        \SatispayOnline\Api::setPluginName('PrestaShop');
-        \SatispayOnline\Api::setPluginVersion($this->version);
-        \SatispayOnline\Api::setPlatformVersion(_PS_VERSION_);
-        \SatispayOnline\Api::setType('ECOMMERCE-PLUGIN');
+        \SatispayGBusiness\Api::setSandbox($currentSandbox);
+        \SatispayGBusiness\Api::setKeyId($currentKeyId);
+        \SatispayGBusiness\Api::setPrivateKey($currentPrivateKey);
+        \SatispayGBusiness\Api::setPublicKey($currentPublicKey);
     }
 
     public function install()
     {
-        Configuration::updateValue('SATISPAY_STAGING', false);
-        Configuration::updateValue('SATISPAY_SECURITY_BEARER', null);
-
         return parent::install() &&
             $this->registerHook('payment') &&
             $this->registerHook('paymentOptions');
@@ -75,189 +76,288 @@ class Satispay extends PaymentModule
 
     public function uninstall()
     {
-        Configuration::deleteByName('SATISPAY_STAGING');
-        Configuration::deleteByName('SATISPAY_SECURITY_BEARER');
+        Configuration::deleteByName('SATISPAY_SANDBOX');
+        Configuration::deleteByName('SATISPAY_ACTIVATION_CODE');
+        Configuration::deleteByName('SATISPAY_KEY_ID');
+        Configuration::deleteByName('SATISPAY_PRIVATE_KEY');
+        Configuration::deleteByName('SATISPAY_PUBLIC_KEY');
+
         return parent::uninstall();
     }
 
+    /**
+     * Load the configuration form
+     */
     public function getContent()
     {
-        $postProcessResult = null;
-        if (((bool)Tools::isSubmit('submitSatispayModule')) == true) {
-            $postProcessResult = $this->postProcess();
+        $postProcessConfigResult = null;
+        if (((bool)Tools::isSubmit('submitSatispayModuleConfig')) == true) {
+            $postProcessConfigResult = $this->postProcessConfig();
         }
 
-        $this->context->smarty->assign('module_dir', $this->_path);
-        $output = $this->context->smarty->fetch($this->local_path.'views/templates/admin/configure.tpl');
-
-        if (_PS_VERSION_ < 1.6) {
-            $form = $this->context->smarty->fetch($this->local_path.'views/templates/admin/form-ps15.tpl');
-            return $output.$form;
-        } else {
-            return $output.$this->renderForm($postProcessResult);
+        $postProcessRefundResult = null;
+        if (((bool)Tools::isSubmit('submitSatispayModuleRefund')) == true) {
+            $postProcessRefundResult = $this->postProcessRefund();
         }
+
+        return $this->renderForm($postProcessConfigResult, $postProcessRefundResult);
     }
 
-    protected function renderForm($postProcessResult)
+    protected function renderForm($postProcessConfigResult, $postProcessRefundResult)
     {
-        $helper = new HelperForm();
+        $this->loadConfiguration();
 
-        $helper->show_toolbar = false;
-        $helper->table = $this->table;
-        $helper->module = $this;
-        $helper->default_form_language = $this->context->language->id;
-        $helper->allow_employee_form_lang = Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG', 0);
+        $configForm = new HelperForm();
 
-        $helper->fields_value = array(
-            'SATISPAY_REFUND_ID' => '',
-            'SATISPAY_REFUND_AMOUNT' => ''
-        );
+        $configForm->show_toolbar = false;
+        $configForm->table = $this->table;
+        $configForm->module = $this;
+        $configForm->default_form_language = $this->context->language->id;
+        $configForm->allow_employee_form_lang = Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG', 0);
 
-        $helper->identifier = $this->identifier;
-        $helper->submit_action = 'submitSatispayModule';
-        $helper->currentIndex = $this->context->link->getAdminLink('AdminModules', false)
+        $configForm->identifier = $this->identifier;
+        $configForm->submit_action = 'submitSatispayModuleConfig';
+        $configForm->currentIndex = $this->context->link->getAdminLink('AdminModules', false)
             .'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name;
-        $helper->token = Tools::getAdminTokenLite('AdminModules');
+        $configForm->token = Tools::getAdminTokenLite('AdminModules');
 
-        $helper->tpl_vars = array(
+        $configForm->tpl_vars = array(
             'fields_value' => $this->getConfigFormValues(),
             'languages' => $this->context->controller->getLanguages(),
-            'id_language' => $this->context->language->id
+            'id_language' => $this->context->language->id,
         );
 
-        $successMessage = null;
-        $errorMessage = null;
-        if (!empty($postProcessResult)) {
-            if ($postProcessResult['success']) {
-                $successMessage = $postProcessResult['message'];
-            } else {
-                $errorMessage = $postProcessResult['message'];
+
+        $refundForm = new HelperForm();
+
+        $refundForm->show_toolbar = false;
+        $refundForm->table = $this->table;
+        $refundForm->module = $this;
+        $refundForm->default_form_language = $this->context->language->id;
+        $refundForm->allow_employee_form_lang = Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG', 0);
+
+        $refundForm->identifier = $this->identifier;
+        $refundForm->submit_action = 'submitSatispayModuleRefund';
+        $refundForm->currentIndex = $this->context->link->getAdminLink('AdminModules', false)
+            .'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name;
+        $refundForm->token = Tools::getAdminTokenLite('AdminModules');
+
+        $refundForm->tpl_vars = array(
+            'fields_value' => $this->getRefundFormValues(),
+            'languages' => $this->context->controller->getLanguages(),
+            'id_language' => $this->context->language->id,
+        );
+
+        
+        $configFormSuccess = '';
+        $configFormError = '';
+        if (!empty($postProcessConfigResult)) {
+            $error = $postProcessConfigResult['error'];
+            $success = $postProcessConfigResult['success'];
+
+            if (!empty($error)) {
+                $configFormError .= $error.'<br />';
+            }
+
+            if (!empty($success)) {
+                $configFormSuccess = $success;
             }
         }
 
-        return $helper->generateForm(array($this->getConfigForm($successMessage, $errorMessage)));
+        // if (\SatispayGBusiness\Api::getSandbox()) {
+        //     $configFormError .= $this->l('Sandbox Mode is Enabled, remember to disable it after tests.').'<br />';
+        // }
+
+        try {
+            \SatispayGBusiness\Payment::all();
+        } catch (\Exception $ex) {
+            $configFormError .= sprintf($this->l('Satispay is not correctly configured, get an Activation Code from Online Shop section on %sSatispay Dashboard%s.'), '<a href="https://business.satispay.com" target="_blank">', '</a>').'<br />';
+        }
+
+        $refundFormSuccess = '';
+        $refundFormError = '';
+        if (!empty($postProcessRefundResult)) {
+            $error = $postProcessRefundResult['error'];
+            $success = $postProcessRefundResult['success'];
+
+            if (!empty($error)) {
+                $refundFormError = $error;
+            }
+
+            if (!empty($success)) {
+                $refundFormSuccess = $success;
+            }
+        }
+
+        return $configForm->generateForm(array($this->getConfigForm($configFormSuccess, $configFormError))).
+            $refundForm->generateForm(array($this->getRefundForm($refundFormSuccess, $refundFormError)));
     }
 
-    protected function getConfigForm($successMessage, $errorMessage)
+    protected function getConfigForm($configFormSuccess, $configFormError)
     {
         return array(
             'form' => array(
-                'tabs' => array(
-                    'settings' => $this->l('Settings'),
-                    'refund' => $this->l('Refund')
+                'legend' => array(
+                    'title' => $this->l('Settings'),
+                    'icon' => 'icon-cogs',
                 ),
-                'success' => $successMessage,
-                'error' => $errorMessage,
+                'success' => $configFormSuccess,
+                'error' => $configFormError,
                 'input' => array(
                     array(
-                        'tab' => 'settings',
+                        'col' => 3,
+                        'type' => 'text',
+                        'label' => $this->l('Activation Code'),
+                        'name' => 'SATISPAY_ACTIVATION_CODE',
+                        'desc' => sprintf($this->l('Get a six characters Activation Code from Online Shop section on %sSatispay Dashboard%s.'), '<a href="https://business.satispay.com" target="_blank">', '</a>'),
+                    ),
+                    array(
                         'type' => 'switch',
-                        'label' => $this->l('Sandbox'),
-                        'name' => 'SATISPAY_STAGING',
+                        'label' => $this->l('Sandbox Mode'),
+                        'name' => 'SATISPAY_SANDBOX',
                         'is_bool' => true,
-                        'desc' => $this->l('Enable Sandbox for testing'),
+                        'desc' => sprintf($this->l('Sandbox Mode can be used to test payments. Request a %sSandbox Account%s.'), '<a href="https://developers.satispay.com/docs/sandbox-account" target="_blank">', '</a>'),
                         'values' => array(
                             array(
                                 'id' => 'active_on',
                                 'value' => true,
-                                'label' => $this->l('Yes')
+                                'label' => $this->l('Enabled')
                             ),
                             array(
                                 'id' => 'active_off',
                                 'value' => false,
-                                'label' => $this->l('No')
+                                'label' => $this->l('Disabled')
                             )
-                        )
+                        ),
                     ),
-                    array(
-                        'tab' => 'settings',
-                        'type' => 'text',
-                        'name' => 'SATISPAY_SECURITY_BEARER',
-                        'label' => $this->l('Security Bearer'),
-                        'desc' => $this->l('Get from business.satispay.com'),
-                    ),
-                    array(
-                        'tab' => 'refund',
-                        'type' => 'text',
-                        'name' => 'SATISPAY_REFUND_ID',
-                        'label' => $this->l('Order ID'),
-                        'desc' => $this->l('Get from Order list or details')
-                    ),
-                    array(
-                        'tab' => 'refund',
-                        'type' => 'text',
-                        'name' => 'SATISPAY_REFUND_AMOUNT',
-                        'label' => $this->l('Amount'),
-                        'desc' => $this->l('Leave empty to refund the total amount')
-                    )
                 ),
                 'submit' => array(
                     'title' => $this->l('Save'),
-                )
-            )
+                ),
+            ),
         );
     }
 
     protected function getConfigFormValues()
     {
         return array(
-            'SATISPAY_STAGING' => Configuration::get('SATISPAY_STAGING', false),
-            'SATISPAY_SECURITY_BEARER' => Configuration::get('SATISPAY_SECURITY_BEARER', null),
-            'SATISPAY_REFUND_ID' => null,
-            'SATISPAY_REFUND_AMOUNT' => null
+            'SATISPAY_SANDBOX' => Configuration::get('SATISPAY_SANDBOX', false),
+            'SATISPAY_ACTIVATION_CODE' => Configuration::get('SATISPAY_ACTIVATION_CODE', ''),
         );
     }
 
-    protected function postProcess()
+    protected function getRefundForm($refundFormSuccess, $refundFormError)
     {
-        $refund_id = Tools::getValue('SATISPAY_REFUND_ID');
-        if (!empty($refund_id)) {
-            $order = new Order($refund_id);
-            if (empty($order->id)) {
+        return array(
+            'form' => array(
+                'legend' => array(
+                    'title' => $this->l('Refund'),
+                ),
+                'success' => $refundFormSuccess,
+                'error' => $refundFormError,
+                'input' => array(
+                    array(
+                        'col' => 3,
+                        'type' => 'text',
+                        'label' => $this->l('Payment ID'),
+                        'name' => 'SATISPAY_REFUND_PAYMENT_ID',
+                        'desc' => $this->l('Get the Payment ID from Order details > Payment > Transaction ID.')
+                    ),
+                    array(
+                        'col' => 3,
+                        'type' => 'text',
+                        'label' => $this->l('Amount'),
+                        'name' => 'SATISPAY_REFUND_AMOUNT',
+                        'desc' => $this->l('Leave empty to refund the total amount.').'<br />'.$this->l('Decimals must be divided with a dot.')
+                    ),
+                ),
+                'submit' => array(
+                    'title' => $this->l('Refund'),
+                ),
+            ),
+        );
+    }
+
+    protected function getRefundFormValues()
+    {
+        return array(
+            'SATISPAY_REFUND_PAYMENT_ID' => Configuration::get('SATISPAY_REFUND_PAYMENT_ID', ''),
+            'SATISPAY_REFUND_AMOUNT' => Configuration::get('SATISPAY_REFUND_AMOUNT', ''),
+        );
+    }
+
+    protected function postProcessConfig()
+    {
+        $postedSandbox = Tools::getValue('SATISPAY_SANDBOX');
+        $postedActivationCode = Tools::getValue('SATISPAY_ACTIVATION_CODE');
+
+        $currentActivationCode = Configuration::get('SATISPAY_ACTIVATION_CODE', '');
+
+        Configuration::updateValue('SATISPAY_SANDBOX', $postedSandbox);
+
+        if ($postedActivationCode != $currentActivationCode) {
+            if ($postedSandbox == '1') {
+                \SatispayGBusiness\Api::setSandbox(true);
+            }
+            
+            try {
+                $authentication = \SatispayGBusiness\Api::authenticateWithToken($postedActivationCode);
+
+                Configuration::updateValue('SATISPAY_ACTIVATION_CODE', $postedActivationCode);
+                Configuration::updateValue('SATISPAY_KEY_ID', $authentication->keyId);
+                Configuration::updateValue('SATISPAY_PRIVATE_KEY', $authentication->privateKey);
+                Configuration::updateValue('SATISPAY_PUBLIC_KEY', $authentication->publicKey);
+            } catch (\Exception $ex) {
+                Configuration::deleteByName('SATISPAY_ACTIVATION_CODE');
+                Configuration::deleteByName('SATISPAY_KEY_ID');
+                Configuration::deleteByName('SATISPAY_PRIVATE_KEY');
+                Configuration::deleteByName('SATISPAY_PUBLIC_KEY');
+
                 return array(
-                    'success' => false,
-                    'message' => $this->l('Invalid Order ID')
+                    'success' => '',
+                    'error' => sprintf($this->l('The Activation Code "%s" is invalid.'), $postedActivationCode),
                 );
             }
+        }
 
-            $payments = $order->getOrderPaymentCollection();
-            $transaction_id = $payments[0]->transaction_id;
+        return array(
+            'success' => $this->l('Successfully saved.'),
+            'error' => '',
+        );
+    }
 
-            $refund_amount = Tools::getValue('SATISPAY_REFUND_AMOUNT');
-            if (empty($refund_amount)) {
-                $refund_amount = $order->total_paid_tax_incl;
-            }
+    protected function postProcessRefund()
+    {
+        $postedRefundPaymentId = Tools::getValue('SATISPAY_REFUND_PAYMENT_ID');
+        $postedRefundAmount = Tools::getValue('SATISPAY_REFUND_AMOUNT');
 
-            $currency = new Currency($order->id_currency);
+        if (empty($postedRefundPaymentId)) {
+            return array();
+        }
 
-            try {
-                \SatispayOnline\Refund::create(array(
-                    'charge_id' => $transaction_id,
-                    'currency' => $currency->iso_code,
-                    'amount' => round($refund_amount * 100),
-                    'description' => '#'.$order->reference
-                ));
-            } catch (\Exception $ex) {
-                return 'Satispay Error '.$ex->getCode().': '.$ex->getMessage();
-            }
-
-            $order->setCurrentState(7);
-
-            return array(
-                'success' => true,
-                'message' => $this->l('Successfully refunded')
+        try {
+            $refund = array(
+                'flow' => 'REFUND',
+                'currency' => 'EUR',
+                'parent_payment_uid' => $postedRefundPaymentId
             );
-        } else {
-            $form_values = $this->getConfigFormValues();
-            foreach (array_keys($form_values) as $key) {
-                Configuration::updateValue($key, Tools::getValue($key));
+            
+            if ($postedRefundAmount != '') {
+                $refund['amount_unit'] = $postedRefundAmount * 100;
             }
 
+            \SatispayGBusiness\Payment::create($refund);
+        } catch (\Exception $ex) {
             return array(
-                'success' => true,
-                'message' => $this->l('Successfully saved')
+                'success' => '',
+                'error' => sprintf($this->l('Unable to refund Payment "%s".'), $postedRefundPaymentId),
             );
         }
+
+        return array(
+            'success' => sprintf($this->l('Successfully refunded Payment "%s".'), $postedRefundPaymentId),
+            'error' => '',
+        );
     }
 
     public function hookPayment($params)
@@ -270,11 +370,8 @@ class Satispay extends PaymentModule
         }
 
         $this->smarty->assign('module_dir', $this->_path);
-        if (_PS_VERSION_ < 1.6) {
-            return $this->display(__FILE__, 'views/templates/hook/payment-ps15.tpl');
-        } else {
-            return $this->display(__FILE__, 'views/templates/hook/payment.tpl');
-        }
+
+        return $this->display(__FILE__, 'views/templates/hook/payment.tpl');
     }
 
     public function hookPaymentOptions($params)
@@ -286,9 +383,11 @@ class Satispay extends PaymentModule
             return false;
         }
 
-        $option = new PrestaShop\PrestaShop\Core\Payment\PaymentOption();
-        $option->setCallToActionText($this->l('Satispay'))
-            ->setAction($this->context->link->getModuleLink($this->name, 'payment', array(), true));
-        return array($option);
+        $paymentOption = new \PrestaShop\PrestaShop\Core\Payment\PaymentOption();
+        $paymentOption->setCallToActionText($this->l('Pay with Satispay'))
+            ->setAction($this->context->link->getModuleLink($this->name, 'payment', array(), true))
+            ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/payment_logo.png'));
+        
+        return array($paymentOption);
     }
 }
