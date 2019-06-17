@@ -38,7 +38,7 @@ class SatispayPaymentModuleFrontController extends ModuleFrontController
             array(
                 'payment_id' => '{uuid}',
             ),
-            true,
+            true
         ));
 
         $callbackUrl = urldecode($this->context->link->getModuleLink(
@@ -47,7 +47,7 @@ class SatispayPaymentModuleFrontController extends ModuleFrontController
             array(
                 'payment_id' => '{uuid}',
             ),
-            true,
+            true
         ));
 
         $payment = \SatispayGBusiness\Payment::create(array(
@@ -58,7 +58,7 @@ class SatispayPaymentModuleFrontController extends ModuleFrontController
             'metadata' => array(
                 'cart_id' => $cart->id,
                 'redirect_url' => $redirectUrl,
-            ),
+            )
         ));
 
         $satispayUrl = 'https://online.satispay.com';
