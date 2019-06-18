@@ -1,29 +1,4 @@
 <?php
-/**
-* 2007-2019 PrestaShop
-*
-* NOTICE OF LICENSE
-*
-* This source file is subject to the Academic Free License (AFL 3.0)
-* that is bundled with this package in the file LICENSE.txt.
-* It is also available through the world-wide-web at this URL:
-* http://opensource.org/licenses/afl-3.0.php
-* If you did not receive a copy of the license and are unable to
-* obtain it through the world-wide-web, please send an email
-* to license@prestashop.com so we can send you a copy immediately.
-*
-* DISCLAIMER
-*
-* Do not edit or add to this file if you wish to upgrade PrestaShop to newer
-* versions in the future. If you wish to customize PrestaShop for your
-* needs please refer to http://www.prestashop.com for more information.
-*
-*  @author    PrestaShop SA <contact@prestashop.com>
-*  @copyright 2007-2019 PrestaShop SA
-*  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
-*  International Registered Trademark & Property of PrestaShop SA
-*/
-
 namespace SatispayGBusiness;
 
 class ApiAuthentication {
@@ -37,9 +12,12 @@ class Api {
   private static $privateKey;
   private static $publicKey;
   private static $keyId;
-  private static $securityBearer;
-  private static $version = "1.0.2";
+  private static $version = "1.1.0";
   private static $authservicesUrl = "https://authservices.satispay.com";
+  private static $platformVersionHeader;
+  private static $pluginVersionHeader;
+  private static $pluginNameHeader;
+  private static $typeHeader;
 
   /**
    * Generate new keys and authenticate with token
@@ -75,21 +53,6 @@ class Api {
   }
 
   /**
-   * Test authentication keys
-  */
-  public static function testAuthentication() {
-    $result = Request::get("/wally-services/protocol/tests/signature", array(
-      "sign" => true
-    ));
-
-    if ($result->authentication_key->role !== "ONLINE_SHOP" && $result->authentication_key->role !== "DEVICE") {
-      throw new \Exception("Invalid authentication");
-    }
-
-    return $result;
-  }
-
-  /**
    * Get env
    * @return string
   */
@@ -107,6 +70,66 @@ class Api {
     } else {
       self::$authservicesUrl = "https://".$value.".authservices.satispay.com";
     }
+  }
+
+  /**
+   * Get platform version header
+   * @return string
+  */
+  public static function getPlatformVersionHeader() {
+    return self::$platformVersionHeader;
+  }
+  /**
+   * Set platform version header
+   * @param string $value
+  */
+  public static function setPlatformVersionHeader($value) {
+    self::$platformVersionHeader = $value;
+  }
+
+  /**
+   * Get plugin version header
+   * @return string
+  */
+  public static function getPluginVersionHeader() {
+    return self::$pluginVersionHeader;
+  }
+  /**
+   * Set plugin version header
+   * @param string $value
+  */
+  public static function setPluginVersionHeader($value) {
+    self::$pluginVersionHeader = $value;
+  }
+
+  /**
+   * Get plugin name header
+   * @return string
+  */
+  public static function getPluginNameHeader() {
+    return self::$pluginNameHeader;
+  }
+  /**
+   * Set plugin name header
+   * @param string $value
+  */
+  public static function setPluginNameHeader($value) {
+    self::$pluginNameHeader = $value;
+  }
+
+  /**
+   * Get type header
+   * @return string
+  */
+  public static function getTypeHeader() {
+    return self::$typeHeader;
+  }
+  /**
+   * Set type header
+   * @param string $value
+  */
+  public static function setTypeHeader($value) {
+    self::$typeHeader = $value;
   }
 
   /**
@@ -168,21 +191,6 @@ class Api {
   */
   public static function getAuthservicesUrl() {
     return self::$authservicesUrl;
-  }
-
-  /**
-   * Get security bearer
-   * @return string
-  */
-  public static function getSecurityBearer() {
-    return self::$securityBearer;
-  }
-  /**
-   * Set security bearer
-   * @param string $securityBearer
-  */
-  public static function setSecurityBearer($securityBearer) {
-    self::$securityBearer = $securityBearer;
   }
 
   /**

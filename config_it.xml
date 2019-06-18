@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<module>
+    <name>satispay</name>
+    <displayName><![CDATA[Satispay]]></displayName>
+    <version><![CDATA[1.5.0]]></version>
+    <description><![CDATA[Satispay &egrave; l&#039;app per i pagamenti mobile con cui scambiare denaro con i tuoi contatti e pagare i tuoi acquisti. Gratuita, sicura, semplice. #doitsmart]]></description>
+    <author><![CDATA[Satispay]]></author>
+    <tab><![CDATA[payments_gateways]]></tab>
+    <is_configurable>1</is_configurable>
+    <need_instance>1</need_instance>
+	<limited_countries></limited_countries>
+</module>

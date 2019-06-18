@@ -65,6 +65,11 @@ class Satispay extends PaymentModule
         \SatispayGBusiness\Api::setKeyId($currentKeyId);
         \SatispayGBusiness\Api::setPrivateKey($currentPrivateKey);
         \SatispayGBusiness\Api::setPublicKey($currentPublicKey);
+
+        \SatispayGBusiness\Api::setPluginNameHeader('PrestaShop');
+        \SatispayGBusiness\Api::setPluginVersionHeader($this->version);
+        \SatispayGBusiness\Api::setPlatformVersionHeader(_PS_VERSION_);
+        \SatispayGBusiness\Api::setTypeHeader('ECOMMERCE-PLUGIN');
     }
 
     public function install()
