@@ -3,7 +3,7 @@
 global $_MODULE;
 $_MODULE = array();
 $_MODULE['<{satispay}prestashop>satispay_86367103eed16b879a9d5128c99f97a4'] = 'Satispay';
-$_MODULE['<{satispay}prestashop>satispay_9332b5dcf060f09785de90f26d640a8b'] = 'Satispay è l\'app per i pagamenti mobile con cui scambiare denaro con i tuoi contatti e pagare i tuoi acquisti. Gratuita, sicura, semplice. #doitsmart';
+$_MODULE['<{satispay}prestashop>satispay_9332b5dcf060f09785de90f26d640a8b'] = 'Risparmia tempo e denaro ricevendo pagamenti dai tuoi clienti con Satispay. Gratuita, semplice, sicura. #doitsmart';
 $_MODULE['<{satispay}prestashop>satispay_b6ea02a3033db57843a432e5b60bdd10'] = 'La Modalità Sandbox è attiva, ricorda di disabilitarla dopo i test.';
 $_MODULE['<{satispay}prestashop>satispay_d1d3e5571e7f010a231d8ed48578e53e'] = 'Satispay non è configurato correttamente, genera un Codice di Attivazione dalla sezione Negozi Online della %sDashboard Satispay%s.';
 $_MODULE['<{satispay}prestashop>satispay_f4f70727dc34561dfde1a3c529b6205c'] = 'Impostazioni';

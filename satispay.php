@@ -47,7 +47,7 @@ class Satispay extends PaymentModule
         parent::__construct();
 
         $this->displayName = $this->l('Satispay');
-        $this->description = $this->l('With Satispay you can send money to friends and pay in stores from your phone. Free, simple, secure! #doitsmart');
+        $this->description = $this->l('Save time and money by accepting payments from your customers with Satispay. Free, simple, secure! #doitsmart');
         $this->limited_currencies = array('EUR');
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
 
@@ -153,7 +153,7 @@ class Satispay extends PaymentModule
             'id_language' => $this->context->language->id,
         );
 
-        
+
         $configFormSuccess = '';
         $configFormError = '';
         if (!empty($postProcessConfigResult)) {
@@ -304,7 +304,7 @@ class Satispay extends PaymentModule
             if ($postedSandbox == '1') {
                 \SatispayGBusiness\Api::setSandbox(true);
             }
-            
+
             try {
                 $authentication = \SatispayGBusiness\Api::authenticateWithToken($postedActivationCode);
 
@@ -346,7 +346,7 @@ class Satispay extends PaymentModule
                 'currency' => 'EUR',
                 'parent_payment_uid' => $postedRefundPaymentId
             );
-            
+
             if ($postedRefundAmount != '') {
                 $refund['amount_unit'] = $postedRefundAmount * 100;
             }
@@ -392,7 +392,7 @@ class Satispay extends PaymentModule
         $paymentOption->setCallToActionText($this->l('Pay with Satispay'))
             ->setAction($this->context->link->getModuleLink($this->name, 'payment', array(), true))
             ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/payment_logo.png'));
-        
+
         return array($paymentOption);
     }
 }

@@ -3,7 +3,7 @@
     <name>satispay</name>
     <displayName><![CDATA[Satispay]]></displayName>
     <version><![CDATA[1.5.0]]></version>
-    <description><![CDATA[Satispay &egrave; l&#039;app per i pagamenti mobile con cui scambiare denaro con i tuoi contatti e pagare i tuoi acquisti. Gratuita, sicura, semplice. #doitsmart]]></description>
+    <description><![CDATA[Risparmia tempo e denaro ricevendo pagamenti dai tuoi clienti con Satispay. Gratuita, semplice, sicura. #doitsmart]]></description>
     <author><![CDATA[Satispay]]></author>
     <tab><![CDATA[payments_gateways]]></tab>
     <is_configurable>1</is_configurable>
