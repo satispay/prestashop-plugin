@@ -55,6 +55,7 @@ class SatispayPaymentModuleFrontController extends ModuleFrontController
             'amount_unit' => $amountUnit,
             'currency' => $currency->iso_code,
             'callback_url' => $callbackUrl,
+            'external_code' => Order::getOrderByCartId($cart->id),
             'metadata' => array(
                 'cart_id' => $cart->id,
                 'redirect_url' => $redirectUrl,
