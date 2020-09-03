@@ -24,6 +24,8 @@
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
+use Order;
+
 class SatispayPaymentModuleFrontController extends ModuleFrontController
 {
     public function postProcess()
@@ -55,7 +57,7 @@ class SatispayPaymentModuleFrontController extends ModuleFrontController
             'amount_unit' => $amountUnit,
             'currency' => $currency->iso_code,
             'callback_url' => $callbackUrl,
-            'external_code' => Order::getOrderByCartId($cart->id),
+            'external_code' => Order::getIdByCartId($cart->id),
             'metadata' => array(
                 'cart_id' => $cart->id,
                 'redirect_url' => $redirectUrl,
