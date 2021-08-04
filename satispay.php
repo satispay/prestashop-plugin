@@ -32,13 +32,19 @@ if (!defined('_PS_VERSION_')) {
 
 class Satispay extends PaymentModule
 {
+    /**
+     * Satispay Prestashop configuration
+     * use Configuration::get(Satispay::CONST_NAME) to return a value
+     */
+    const SATISPAY_PENDING_STATE = 'SATISPAY_PENDING_STATE';
+
     protected $config_form = false;
 
     public function __construct()
     {
         $this->name = 'satispay';
         $this->tab = 'payments_gateways';
-        $this->version = '1.5.0';
+        $this->version = '2.0.0';
         $this->author = 'Satispay';
         $this->need_instance = 1;
         $this->module_key = '812ed8ea2509dd2146ef979a6af24ee5';
@@ -74,9 +80,20 @@ class Satispay extends PaymentModule
 
     public function install()
     {
-        return parent::install() &&
-            $this->registerHook('payment') &&
-            $this->registerHook('paymentOptions');
+        if (!parent::install()) {
+            return false;
+        }
+
+        if (!($this->registerHook('payment') &&
+            $this->registerHook('paymentOptions'))) {
+            return false;
+        }
+
+        if (!$this->installOrderState()) {
+            return false;
+        }
+
+        return true;
     }
 
     public function uninstall()
@@ -88,6 +105,41 @@ class Satispay extends PaymentModule
         Configuration::deleteByName('SATISPAY_PUBLIC_KEY');
 
         return parent::uninstall();
+    }
+
+    /**
+     * Create order state
+     * @return boolean
+     */
+    public function installOrderState()
+    {
+        /* Create Order State for Satispay */
+        if (!Configuration::get(self::SATISPAY_PENDING_STATE)
+            || !Validate::isLoadedObject(new OrderState(Configuration::get(self::SATISPAY_PENDING_STATE)))) {
+            $order_state = new OrderState();
+            $order_state->name = array();
+            foreach (Language::getLanguages() as $language) {
+                switch (Tools::strtolower($language['iso_code'])) {
+                    case 'it':
+                        $order_state->name[$language['id_lang']] = pSQL('In attesa Satispay');
+                        break;
+
+                    default:
+                        $order_state->name[$language['id_lang']] = pSQL('Pending Satispay');
+                        break;
+                }
+            }
+            $order_state->invoice = false;
+            $order_state->send_email = false;
+            $order_state->logable = true;
+            $order_state->color = '#FFFF00';
+            $order_state->module_name = $this->name;
+            $order_state->add();
+
+            Configuration::updateValue(self::SATISPAY_PENDING_STATE, $order_state->id);
+        }
+
+        return true;
     }
 
     /**

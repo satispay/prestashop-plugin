@@ -30,17 +30,25 @@ class SatispayCallbackModuleFrontController extends ModuleFrontController
     {
         $paymentId = Tools::getValue('payment_id');
         $payment = \SatispayGBusiness\Payment::get($paymentId);
+        $orderId = Order::getOrderByCartId($payment->metadata->cart_id);
+        $order = new Order($orderId);
 
-        if ($payment->status == 'ACCEPTED') {
-            $cart = new Cart($payment->metadata->cart_id);
-            $customer = new Customer($cart->id_customer);
-            $currency = new Currency($cart->id_currency);
+        if ($order->current_state == (int)(Configuration::get('SATISPAY_PENDING_STATE'))) {
+            $history = new OrderHistory();
+            $history->id_order = (int)$orderId;
 
-            $this->module->validateOrder($cart->id, 2, $payment->amount_unit / 100, $this->module->displayName, null, array(
-                'transaction_id' => $payment->id,
-            ), $currency->id, false, $customer->secure_key);
+            if ($payment->status === 'ACCEPTED') {
+                //using existing payment so it's not doubled
+                $history->changeIdOrderState((int)(Configuration::get('PS_OS_PREPARATION')), $orderId, true);
+                $order->setCurrentState((int)(Configuration::get('PS_OS_PREPARATION')));
+                $order->save();
+            }
+
+            if ($payment->status === 'CANCELED') {
+                $order->setCurrentState((int)(Configuration::get('PS_OS_CANCELED')));
+                $order->save();
+            }
         }
-
         exit;
     }
 }
