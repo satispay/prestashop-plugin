@@ -103,6 +103,7 @@ class Satispay extends PaymentModule
         Configuration::deleteByName('SATISPAY_KEY_ID');
         Configuration::deleteByName('SATISPAY_PRIVATE_KEY');
         Configuration::deleteByName('SATISPAY_PUBLIC_KEY');
+        Configuration::deleteByName('SATISPAY_UNPROCESSED_TIME');
 
         return parent::uninstall();
     }
@@ -287,6 +288,16 @@ class Satispay extends PaymentModule
                             )
                         ),
                     ),
+                    array(
+                        'col' => 3,
+                        'type' => 'text',
+                        'label' => $this->l('Finalize all orders updated since'),
+                        'name' => 'SATISPAY_UNPROCESSED_TIME',
+                        'desc' => 'Choose a number of days, default is four minimum is one',
+                        'validation' => 'isInt',
+                        'cast' => 'intval',
+                        'defaultValue' => 2,
+                        ),
                 ),
                 'submit' => array(
                     'title' => $this->l('Save'),
@@ -300,6 +311,7 @@ class Satispay extends PaymentModule
         return array(
             'SATISPAY_SANDBOX' => Configuration::get('SATISPAY_SANDBOX', false),
             'SATISPAY_ACTIVATION_CODE' => Configuration::get('SATISPAY_ACTIVATION_CODE', ''),
+            'SATISPAY_UNPROCESSED_TIME' => Configuration::get('SATISPAY_UNPROCESSED_TIME', 0),
         );
     }
 
@@ -346,10 +358,18 @@ class Satispay extends PaymentModule
     protected function postProcessConfig()
     {
         $postedSandbox = Tools::getValue('SATISPAY_SANDBOX');
+        $postedUnprocessedTime = Tools::getValue('SATISPAY_UNPROCESSED_TIME');
         $postedActivationCode = Tools::getValue('SATISPAY_ACTIVATION_CODE');
 
         $currentActivationCode = Configuration::get('SATISPAY_ACTIVATION_CODE', '');
 
+        if (!is_numeric($postedUnprocessedTime) || $postedUnprocessedTime < 1) {
+            return array(
+                'success' => '',
+                'error' => sprintf($this->l('A numeric value has to be specified. Minimum is one.')),
+            );
+        }
+        Configuration::updateValue('SATISPAY_UNPROCESSED_TIME', $postedUnprocessedTime);
         Configuration::updateValue('SATISPAY_SANDBOX', $postedSandbox);
 
         if ($postedActivationCode != $currentActivationCode) {
