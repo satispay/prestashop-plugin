@@ -14,19 +14,7 @@ class ProcessPendingOrders
 
     public function execute()
     {
-        $rangeStart = $this->getStartDateScheduledTime();
-        $rangeEnd = $this->getEndDateScheduledTime();
-        $sql = 'SELECT id_order
-                FROM ' . _DB_PREFIX_ . 'orders
-                WHERE current_state = ' . (int)(Configuration::get('SATISPAY_PENDING_STATE')) . '
-                AND date_upd <= \'' . pSQL($rangeEnd) . '\' AND date_upd >= \'' . pSQL($rangeStart) . '\'
-                ORDER BY invoice_date ASC';
-
-        $result = Db::getInstance()->executeS($sql);
-        $ordersToProcess = [];
-        foreach ($result as $data) {
-            $ordersToProcess[] = (int) $data['id_order'];
-        }
+        $ordersToProcess = $this->getPendingOrders();
 
         foreach ($ordersToProcess as $order) {
             $orderPayments = OrderPayment::getByOrderId($order);
@@ -107,5 +95,23 @@ class ProcessPendingOrders
         // remove just 1 day so normal transactions can still be processed
         $tosub = new \DateInterval('PT'. 1 . 'H');
         return $now->sub($tosub)->format('Y-m-d H:i:s');
+    }
+
+    private function getPendingOrders()
+    {
+        $rangeStart = $this->getStartDateScheduledTime();
+        $rangeEnd = $this->getEndDateScheduledTime();
+        $sql = 'SELECT id_order
+                FROM ' . _DB_PREFIX_ . 'orders
+                WHERE current_state = ' . (int)(Configuration::get('SATISPAY_PENDING_STATE')) . '
+                AND date_upd <= \'' . pSQL($rangeEnd) . '\' AND date_upd >= \'' . pSQL($rangeStart) . '\'
+                ORDER BY invoice_date ASC';
+
+        $result = Db::getInstance()->executeS($sql);
+        $ordersToProcess = [];
+        foreach ($result as $data) {
+            $ordersToProcess[] = (int) $data['id_order'];
+        }
+        return $ordersToProcess;
     }
 }
