@@ -33,17 +33,8 @@ class SatispayRedirectModuleFrontController extends ModuleFrontController
 
         if ($payment->status === 'ACCEPTED') {
 
-            //create order in Prestashop
-            $cart = new Cart($payment->metadata->cart_id);
-            $customer = new Customer($cart->id_customer);
-            $currency = new Currency($cart->id_currency);
-
-            //set custom order state for Satispay orders in "pending"
-            $this->module->validateOrder($cart->id, (int)(Configuration::get('SATISPAY_PENDING_STATE')), $payment->amount_unit / 100, $this->module->displayName, null, array(
-                'transaction_id' => $payment->id,
-            ), $currency->id, false, $customer->secure_key);
-
             for ($i = 0; $i < 6; $i++) {
+
                 $orderId = Order::getOrderByCartId($payment->metadata->cart_id);
                 $order = new Order($orderId);
 
