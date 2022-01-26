@@ -293,7 +293,7 @@ class Satispay extends PaymentModule
                         'type' => 'text',
                         'label' => $this->l('Finalize all orders updated since'),
                         'name' => 'SATISPAY_UNPROCESSED_TIME',
-                        'desc' => 'Choose a number of days, default is four minimum is one',
+                        'desc' => 'Choose a number of hours, default is four minimum is one',
                         'validation' => 'isInt',
                         'cast' => 'intval',
                         'defaultValue' => 2,

@@ -16,16 +16,16 @@ class ProcessPendingOrders
     {
         $rangeStart = $this->getStartDateScheduledTime();
         $rangeEnd = $this->getEndDateScheduledTime();
+        $sql = 'SELECT id_order
+                FROM ' . _DB_PREFIX_ . 'orders
+                WHERE current_state = ' . (int)(Configuration::get('SATISPAY_PENDING_STATE')) . '
+                AND date_upd <= \'' . pSQL($rangeEnd) . '\' AND date_upd >= \'' . pSQL($rangeStart) . '\'
+                ORDER BY invoice_date ASC';
 
-        $ordersIdFromSatispay= Order::getOrderIdsByStatus((int)(Configuration::get('SATISPAY_PENDING_STATE')));
-        $ordersIdFromRange= Order::getOrdersIdByDate($rangeStart, $rangeEnd);
-
+        $result = Db::getInstance()->executeS($sql);
         $ordersToProcess = [];
-
-        foreach ($ordersIdFromSatispay as $orderId) {
-            if (in_array($orderId, $ordersIdFromRange)) {
-                $ordersToProcess[] = $orderId;
-            }
+        foreach ($result as $data) {
+            $ordersToProcess[] = (int) $data['id_order'];
         }
 
         foreach ($ordersToProcess as $order) {
@@ -94,8 +94,8 @@ class ProcessPendingOrders
         if (!isset($scheduledTimeFrame)) {
             $scheduledTimeFrame = 2;
         }
-        $tosub = new \DateInterval('P'. $scheduledTimeFrame . 'D');
-        return $now->sub($tosub)->format('Y-m-d');
+        $tosub = new \DateInterval('PT'. $scheduledTimeFrame . 'H');
+        return $now->sub($tosub)->format('Y-m-d H:i:s');
     }
 
     /**
@@ -105,7 +105,7 @@ class ProcessPendingOrders
     {
         $now = new \DateTime();
         // remove just 1 day so normal transactions can still be processed
-        $tosub = new \DateInterval('P'. 1 . 'D');
-        return $now->sub($tosub)->format('Y-m-d');
+        $tosub = new \DateInterval('PT'. 1 . 'H');
+        return $now->sub($tosub)->format('Y-m-d H:i:s');
     }
 }
