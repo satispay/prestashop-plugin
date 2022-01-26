@@ -19,7 +19,9 @@ class ProcessPendingOrders
         foreach ($ordersToProcess as $order) {
             $orderPayments = OrderPayment::getByOrderId($order);
             $transactionId = $orderPayments[0]->transaction_id;
-
+            if (empty($transactionId)) {
+                continue;
+            }
             $payment = \SatispayGBusiness\Payment::get($transactionId);
             $orderId = Order::getOrderByCartId($payment->metadata->cart_id);
             $order = new Order($orderId);
