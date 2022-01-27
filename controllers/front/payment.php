@@ -32,6 +32,17 @@ class SatispayPaymentModuleFrontController extends ModuleFrontController
         $currency = $this->context->currency;
         $amountUnit = $cart->getOrderTotal(true, Cart::BOTH) * 100;
 
+        //create order in Prestashop
+        $customer = new Customer($cart->id_customer);
+        $currency = new Currency($cart->id_currency);
+
+        //set custom order state for Satispay orders in "pending"
+        $this->module->validateOrder($cart->id, (int)(Configuration::get('SATISPAY_PENDING_STATE')), $amountUnit / 100, $this->module->displayName, null, array(
+            ), $currency->id, false, $customer->secure_key);
+
+        $orderId = Order::getOrderByCartId((int)($cart->id));
+        $order = new Order($orderId);
+
         $redirectUrl = urldecode($this->context->link->getModuleLink(
             $this->module->name,
             'redirect',
@@ -55,6 +66,7 @@ class SatispayPaymentModuleFrontController extends ModuleFrontController
             'amount_unit' => $amountUnit,
             'currency' => $currency->iso_code,
             'callback_url' => $callbackUrl,
+            'external_code' => $order->reference,
             'metadata' => array(
                 'cart_id' => $cart->id,
                 'redirect_url' => $redirectUrl,
@@ -64,6 +76,13 @@ class SatispayPaymentModuleFrontController extends ModuleFrontController
         $satispayUrl = 'https://online.satispay.com';
         if (\SatispayGBusiness\Api::getSandbox()) {
             $satispayUrl = 'https://staging.online.satispay.com';
+        }
+
+        if (!empty($order->id)) {
+            $orderPaymentCollection = $order->getOrderPaymentCollection();
+            $orderPayment = $orderPaymentCollection[0];
+            $orderPayment->transaction_id = $payment->id;
+            $orderPayment->update();
         }
 
         Tools::redirect(sprintf('%s/pay/%s', $satispayUrl, $payment->id));
