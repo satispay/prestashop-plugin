@@ -30,7 +30,7 @@ class SatispayPaymentModuleFrontController extends ModuleFrontController
     {
         $cart = $this->context->cart;
         $currency = $this->context->currency;
-        $amountUnit = $cart->getOrderTotal(true, Cart::BOTH) * 100;
+        $amountUnit = round($cart->getOrderTotal(true, Cart::BOTH) * 100);
 
         //create order in Prestashop
         $customer = new Customer($cart->id_customer);
