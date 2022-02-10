@@ -37,6 +37,7 @@ class Satispay extends PaymentModule
      * use Configuration::get(Satispay::CONST_NAME) to return a value
      */
     const SATISPAY_PENDING_STATE = 'SATISPAY_PENDING_STATE';
+    const SATISPAY_DEFAULT_UNPROCESSED_TIME = 4;
 
     protected $config_form = false;
 
@@ -293,10 +294,10 @@ class Satispay extends PaymentModule
                         'type' => 'text',
                         'label' => $this->l('Finalize all orders updated since'),
                         'name' => 'SATISPAY_UNPROCESSED_TIME',
-                        'desc' => 'Choose a number of hours, default is four minimum is one',
+                        'desc' => 'Choose a number of hours, default is four minimum is two',
                         'validation' => 'isInt',
                         'cast' => 'intval',
-                        'defaultValue' => 2,
+                        'defaultValue' => self::SATISPAY_DEFAULT_UNPROCESSED_TIME,
                         ),
                 ),
                 'submit' => array(
@@ -311,7 +312,7 @@ class Satispay extends PaymentModule
         return array(
             'SATISPAY_SANDBOX' => Configuration::get('SATISPAY_SANDBOX', false),
             'SATISPAY_ACTIVATION_CODE' => Configuration::get('SATISPAY_ACTIVATION_CODE', ''),
-            'SATISPAY_UNPROCESSED_TIME' => Configuration::get('SATISPAY_UNPROCESSED_TIME', 0),
+            'SATISPAY_UNPROCESSED_TIME' => (Configuration::get('SATISPAY_UNPROCESSED_TIME') ? Configuration::get('SATISPAY_UNPROCESSED_TIME') : self::SATISPAY_DEFAULT_UNPROCESSED_TIME),
         );
     }
 
@@ -363,10 +364,10 @@ class Satispay extends PaymentModule
 
         $currentActivationCode = Configuration::get('SATISPAY_ACTIVATION_CODE', '');
 
-        if (!is_numeric($postedUnprocessedTime) || $postedUnprocessedTime < 1) {
+        if (!is_numeric($postedUnprocessedTime) || $postedUnprocessedTime < 2) {
             return array(
                 'success' => '',
-                'error' => sprintf($this->l('A numeric value has to be specified. Minimum is one.')),
+                'error' => sprintf($this->l('A numeric value has to be specified. Minimum is two.')),
             );
         }
         Configuration::updateValue('SATISPAY_UNPROCESSED_TIME', $postedUnprocessedTime);
