@@ -81,8 +81,8 @@ class ProcessPendingOrders
     {
         $now = new \DateTime();
         $scheduledTimeFrame = (int)(Configuration::get('SATISPAY_UNPROCESSED_TIME'));
-        if (!isset($scheduledTimeFrame)) {
-            $scheduledTimeFrame = 2;
+        if (!($scheduledTimeFrame)) {
+            $scheduledTimeFrame = Satispay::SATISPAY_DEFAULT_UNPROCESSED_TIME;
         }
         $tosub = new \DateInterval('PT'. $scheduledTimeFrame . 'H');
         return $now->sub($tosub)->format('Y-m-d H:i:s');
