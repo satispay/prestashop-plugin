@@ -123,18 +123,18 @@ class Satispay extends PaymentModule
             foreach (Language::getLanguages() as $language) {
                 switch (Tools::strtolower($language['iso_code'])) {
                     case 'it':
-                        $order_state->name[$language['id_lang']] = pSQL('In attesa Satispay');
+                        $order_state->name[$language['id_lang']] = pSQL('In attesa di pagamento con Satispay');
                         break;
 
                     default:
-                        $order_state->name[$language['id_lang']] = pSQL('Pending Satispay');
+                        $order_state->name[$language['id_lang']] = pSQL('Waiting for Satispay payment');
                         break;
                 }
             }
             $order_state->invoice = false;
             $order_state->send_email = false;
             $order_state->logable = true;
-            $order_state->color = '#FFFF00';
+            $order_state->color = '#EF5350';
             $order_state->module_name = $this->name;
             $order_state->add();
 
@@ -268,14 +268,14 @@ class Satispay extends PaymentModule
                         'type' => 'text',
                         'label' => $this->l('Activation Code'),
                         'name' => 'SATISPAY_ACTIVATION_CODE',
-                        'desc' => sprintf($this->l('Get a six characters Activation Code from Online Shop section on %sSatispay Dashboard%s.'), '<a href="https://business.satispay.com" target="_blank">', '</a>'),
+                        'desc' => sprintf($this->l('Get a six characters activation code from Online Shop section on %sSatispay Dashboard%s.'), '<a href="https://business.satispay.com" target="_blank">', '</a>'),
                     ),
                     array(
                         'type' => 'switch',
                         'label' => $this->l('Sandbox Mode'),
                         'name' => 'SATISPAY_SANDBOX',
                         'is_bool' => true,
-                        'desc' => sprintf($this->l('Sandbox Mode can be used to test payments. Request a %sSandbox Account%s.'), '<a href="https://developers.satispay.com/docs/sandbox-account" target="_blank">', '</a>'),
+                        'desc' => sprintf($this->l('Sandbox Mode can be used to test the module.').'<br />'.$this->l('Request a %sSandbox Account%s.'), '<a href="https://developers.satispay.com/docs/sandbox-account" target="_blank">', '</a>'),
                         'values' => array(
                             array(
                                 'id' => 'active_on',
@@ -292,9 +292,9 @@ class Satispay extends PaymentModule
                     array(
                         'col' => 3,
                         'type' => 'text',
-                        'label' => $this->l('Finalize all orders updated since'),
+                        'label' => $this->l('Finalize pending payments up to'),
                         'name' => 'SATISPAY_UNPROCESSED_TIME',
-                        'desc' => 'Choose a number of hours, default is four minimum is two',
+                        'desc' => 'Choose a number of hours, default is four and minimum is two.',
                         'validation' => 'isInt',
                         'cast' => 'intval',
                         'defaultValue' => self::SATISPAY_DEFAULT_UNPROCESSED_TIME,
