@@ -294,7 +294,7 @@ class Satispay extends PaymentModule
                         'type' => 'text',
                         'label' => $this->l('Finalize pending payments up to'),
                         'name' => 'SATISPAY_UNPROCESSED_TIME',
-                        'desc' => 'Choose a number of hours, default is four and minimum is two.',
+                        'desc' => $this->l('Choose a number of hours, default is four and minimum is two.'),
                         'validation' => 'isInt',
                         'cast' => 'intval',
                         'defaultValue' => self::SATISPAY_DEFAULT_UNPROCESSED_TIME,

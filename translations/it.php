@@ -15,6 +15,7 @@ $_MODULE['<{satispay}prestashop>satispay_e1b27ffca3b767eb792352db1a40c48a'] = 'R
 $_MODULE['<{satispay}prestashop>satispay_00d23a76e43b46dae9ec7aa9dcbebb32'] = 'Abilitato';
 $_MODULE['<{satispay}prestashop>satispay_b9f5c797ebbf55adccdd8539a65a0241'] = 'Disabilitato';
 $_MODULE['<{satispay}prestashop>satispay_598d64b58532332c424d38d8d8810de9'] = 'Finalizzare i pagamenti in sospeso fino a';
+$_MODULE['<{satispay}prestashop>satispay_68f2ffadf9cc184a799460999a37eda2'] = 'Scegli un numero di ore, il valore predefinito è quattro e il minimo è due.';
 $_MODULE['<{satispay}prestashop>satispay_c9cc8cce247e49bae79f15173ce97354'] = 'Salva';
 $_MODULE['<{satispay}prestashop>satispay_76f0ed934de85cc7131910b32ede7714'] = 'Rimborso';
 $_MODULE['<{satispay}prestashop>satispay_1e63d1811556fc2dad106dcbd4217a69'] = 'ID Pagamento';

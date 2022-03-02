@@ -94,7 +94,7 @@ class ProcessPendingOrders
     private function getEndDateScheduledTime()
     {
         $now = new \DateTime();
-        // remove just 1 day so normal transactions can still be processed
+        // remove just 1 hour so normal transactions can still be processed
         $tosub = new \DateInterval('PT'. 1 . 'H');
         return $now->sub($tosub)->format('Y-m-d H:i:s');
     }
