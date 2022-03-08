@@ -223,10 +223,6 @@ class Satispay extends PaymentModule
             }
         }
 
-        // if (\SatispayGBusiness\Api::getSandbox()) {
-        //     $configFormError .= $this->l('Sandbox Mode is Enabled, remember to disable it after tests.').'<br />';
-        // }
-
         try {
             \SatispayGBusiness\Payment::all();
         } catch (\Exception $ex) {
@@ -294,7 +290,7 @@ class Satispay extends PaymentModule
                         'type' => 'text',
                         'label' => $this->l('Finalize pending payments up to'),
                         'name' => 'SATISPAY_UNPROCESSED_TIME',
-                        'desc' => $this->l('Choose a number of hours, default is four and minimum is two.'),
+                        'desc' => sprintf($this->l('Choose a number of hours, default is four and minimum is two.').'<br />'.$this->l('More details on our %sdocumentation%s.'), '<a href="http://developers.satispay.com/docs/prestashop" target="_blank">', '</a>'),
                         'validation' => 'isInt',
                         'cast' => 'intval',
                         'defaultValue' => self::SATISPAY_DEFAULT_UNPROCESSED_TIME,

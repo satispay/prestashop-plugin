@@ -56,8 +56,8 @@ class ProcessPendingOrders
 
                 if ($payment->status === 'ACCEPTED') {
                     //using existing payment so it's not doubled
-                    $history->changeIdOrderState((int)(Configuration::get('PS_OS_PREPARATION')), $orderId, true);
-                    $order->setCurrentState((int)(Configuration::get('PS_OS_PREPARATION')));
+                    $history->changeIdOrderState((int)(Configuration::get('PS_OS_PAYMENT')), $orderId, true);
+                    $order->setCurrentState((int)(Configuration::get('PS_OS_PAYMENT')));
 
                     $orderMessage = new Message();
                     $orderMessage->id_order = (int)$orderId;

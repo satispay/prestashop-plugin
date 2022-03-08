@@ -4,7 +4,6 @@ global $_MODULE;
 $_MODULE = array();
 $_MODULE['<{satispay}prestashop>satispay_86367103eed16b879a9d5128c99f97a4'] = 'Satispay';
 $_MODULE['<{satispay}prestashop>satispay_ca005cfc9e4e432fcd61dedc6f2f3780'] = 'Risparmia tempo e denaro ricevendo pagamenti dai tuoi clienti con Satispay. Gratuita, semplice, sicura. #doitsmart';
-$_MODULE['<{satispay}prestashop>satispay_b6ea02a3033db57843a432e5b60bdd10'] = 'La Modalità Sandbox è attiva, ricorda di disabilitarla dopo i test.';
 $_MODULE['<{satispay}prestashop>satispay_d1d3e5571e7f010a231d8ed48578e53e'] = 'Satispay non è configurato correttamente, genera un Codice di Attivazione dalla sezione Negozi Online della %sDashboard Satispay%s.';
 $_MODULE['<{satispay}prestashop>satispay_f4f70727dc34561dfde1a3c529b6205c'] = 'Impostazioni';
 $_MODULE['<{satispay}prestashop>satispay_6a122e5c7cb7d36caaef7457e1f6034d'] = 'Codice di Attivazione';
@@ -16,6 +15,7 @@ $_MODULE['<{satispay}prestashop>satispay_00d23a76e43b46dae9ec7aa9dcbebb32'] = 'A
 $_MODULE['<{satispay}prestashop>satispay_b9f5c797ebbf55adccdd8539a65a0241'] = 'Disabilitato';
 $_MODULE['<{satispay}prestashop>satispay_598d64b58532332c424d38d8d8810de9'] = 'Finalizzare i pagamenti in sospeso fino a';
 $_MODULE['<{satispay}prestashop>satispay_68f2ffadf9cc184a799460999a37eda2'] = 'Scegli un numero di ore, il valore predefinito è quattro e il minimo è due.';
+$_MODULE['<{satispay}prestashop>satispay_6bbc21d96a550dc70bf6b931f2e7282c'] = 'Maggiori dettagli sulla nostra %sdocumentazione%s.';
 $_MODULE['<{satispay}prestashop>satispay_c9cc8cce247e49bae79f15173ce97354'] = 'Salva';
 $_MODULE['<{satispay}prestashop>satispay_76f0ed934de85cc7131910b32ede7714'] = 'Rimborso';
 $_MODULE['<{satispay}prestashop>satispay_1e63d1811556fc2dad106dcbd4217a69'] = 'ID Pagamento';

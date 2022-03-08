@@ -11,6 +11,5 @@ cp -R satispay.php tmp/satispay
 cp -R processpendingorderscommand.php tmp/satispay
 cp -R ProcessPendingOrders.php tmp/satispay
 cp -R config.xml tmp/satispay
-cp -R config_it.xml tmp/satispay
 cd tmp && find . -name ".DS_Store" -delete
 zip -r satispay.zip . -x ".*" -x "__MACOSX"
