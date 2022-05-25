@@ -46,9 +46,7 @@ class SatispayPaymentModuleFrontController extends ModuleFrontController
         $redirectUrl = urldecode($this->context->link->getModuleLink(
             $this->module->name,
             'redirect',
-            array(
-                'payment_id' => '{uuid}',
-            ),
+            array(),
             true
         ));
 
@@ -67,16 +65,11 @@ class SatispayPaymentModuleFrontController extends ModuleFrontController
             'currency' => $currency->iso_code,
             'callback_url' => $callbackUrl,
             'external_code' => $order->reference,
+            'redirect_url' => $redirectUrl,
             'metadata' => array(
                 'cart_id' => $cart->id,
-                'redirect_url' => $redirectUrl,
             )
         ));
-
-        $satispayUrl = 'https://online.satispay.com';
-        if (\SatispayGBusiness\Api::getSandbox()) {
-            $satispayUrl = 'https://staging.online.satispay.com';
-        }
 
         if (!empty($order->id)) {
             $orderPaymentCollection = $order->getOrderPaymentCollection();
@@ -85,6 +78,6 @@ class SatispayPaymentModuleFrontController extends ModuleFrontController
             $orderPayment->update();
         }
 
-        Tools::redirect(sprintf('%s/pay/%s', $satispayUrl, $payment->id));
+        Tools::redirect($payment->redirect_url);
     }
 }
