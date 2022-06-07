@@ -28,7 +28,21 @@ class SatispayRedirectModuleFrontController extends ModuleFrontController
 {
     public function postProcess()
     {
-        $paymentId = Tools::getValue('payment_id');
+        //retrieve transaction id of last order by customer context
+        $currentCustomerId = $this->context->customer->id;
+        $customerOrders = Order::getCustomerOrders($currentCustomerId);
+        $paymentId = null;
+        if ($customerOrders) {
+            $lastOrder = new Order((int) $customerOrders[0]['id_order']);
+            $orderPayments = OrderPayment::getByOrderId($lastOrder->id);
+            $paymentId = $orderPayments[0]->transaction_id;
+        }
+        if (empty($paymentId)) {
+            // can't collect order/transaction_id from customer context, payment is still valid and no need to restore cart
+            $orderLink = $this->context->link->getPageLink('order', true, null);
+            Tools::redirect($orderLink);
+        }
+
         $payment = \SatispayGBusiness\Payment::get($paymentId);
 
         if ($payment->status === 'ACCEPTED') {
