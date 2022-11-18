@@ -66,10 +66,28 @@ class SatispayRedirectModuleFrontController extends ModuleFrontController
                 }
             }
 
-            // TODO: error page
             $historyLink = $this->context->link->getPageLink('history', true, null);
             Tools::redirect($historyLink);
         } else {
+            $oldCart = new Cart($payment->metadata->cart_id);
+            $duplication = $oldCart->duplicate();
+            if (!$duplication || !Validate::isLoadedObject($duplication['cart'])) {
+                $this->errors[] = Tools::displayError('Sorry. We cannot renew your order.');
+            } elseif (!$duplication['success']) {
+                $this->errors[] = Tools::displayError('Some items are no longer available, and we are unable to renew your order.');
+            } else {
+                $this->context->cookie->id_cart = $duplication['cart']->id;
+                $context = $this->context;
+                $context->cart = $duplication['cart'];
+                CartRule::autoAddToCart($context);
+                $this->context->cookie->write();
+            }
+
+            $orderId = Order::getOrderByCartId($payment->metadata->cart_id);
+            $order = new Order($orderId);
+            $order->setCurrentState((int)(Configuration::get('PS_OS_CANCELED')));
+            $order->save();
+
             \SatispayGBusiness\Payment::update($payment->id, array(
                 'action' => 'CANCEL'
             ));
