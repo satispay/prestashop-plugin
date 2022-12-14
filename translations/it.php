@@ -30,3 +30,5 @@ $_MODULE['<{satispay}prestashop>satispay_d53277248e135cf487dae1b405002186'] = 'N
 $_MODULE['<{satispay}prestashop>satispay_a492d61134ac70edcc744bbddffea39e'] = 'Il Pagamento \"%s\" è stato rimborsato con successo.';
 $_MODULE['<{satispay}prestashop>satispay_6cef7023d4b06b1c984e65e0b8807a21'] = 'Paga con Satispay';
 $_MODULE['<{satispay}prestashop>payment_6cef7023d4b06b1c984e65e0b8807a21'] = 'Paga con Satispay';
+$_MODULE['<{satispay}prestashop>redirect_56ca67fde405db4d75fb5fc3350db81b'] = 'Scusa. Non possiamo rinnovare il tuo ordine.';
+$_MODULE['<{satispay}prestashop>redirect_b22604f6ddd3fb79ff38568a5a0141e0'] = 'Alcuni articoli non sono più disponibili e non siamo in grado di rinnovare il tuo ordine.';
