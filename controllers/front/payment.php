@@ -75,6 +75,14 @@ class SatispayPaymentModuleFrontController extends ModuleFrontController
             $orderPaymentCollection = $order->getOrderPaymentCollection();
             $orderPayment = $orderPaymentCollection[0];
             $orderPayment->transaction_id = $payment->id;
+            //check if the payment amount contains over 9 decimals
+            if(strpos($orderPayment->amount, '.') !== false){
+                $number = explode(".", $orderPayment->amount);
+                $nDecimals = strlen($number[1]);
+                if ($nDecimals > 9) {
+                    $orderPayment->amount = $number[0] . '.' . substr($number[1], 0, 9);
+                }
+            }
             $orderPayment->update();
         }
 
