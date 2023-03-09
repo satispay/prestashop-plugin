@@ -226,7 +226,7 @@ class Satispay extends PaymentModule
         try {
             \SatispayGBusiness\Payment::all();
         } catch (\Exception $ex) {
-            $configFormError .= sprintf($this->l('Satispay is not correctly configured, get an Activation Code from Online Shop section on %sSatispay Dashboard%s.'), '<a href="https://business.satispay.com" target="_blank">', '</a>').'<br />';
+            $configFormError .= sprintf($this->l('Satispay is not correctly configured, get an Activation Code from Online Shop section on %sSatispay Dashboard%s.'), '<a href="https://dashboard.satispay.com/signup" target="_blank">', '</a>').'<br />';
         }
 
         $refundFormSuccess = '';
@@ -264,7 +264,7 @@ class Satispay extends PaymentModule
                         'type' => 'text',
                         'label' => $this->l('Activation Code'),
                         'name' => 'SATISPAY_ACTIVATION_CODE',
-                        'desc' => sprintf($this->l('Get a six characters activation code from Online Shop section on %sSatispay Dashboard%s.'), '<a href="https://business.satispay.com" target="_blank">', '</a>'),
+                        'desc' => sprintf($this->l('Get a six characters activation code from Online Shop section on %sSatispay Dashboard%s.'), '<a href="https://dashboard.satispay.com/signup" target="_blank">', '</a>'),
                     ),
                     array(
                         'type' => 'switch',
