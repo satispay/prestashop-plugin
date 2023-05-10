@@ -40,15 +40,19 @@ class ProcessPendingOrders
     {
         $ordersToProcess = $this->getPendingOrders();
 
-        foreach ($ordersToProcess as $order) {
-            $orderPayments = OrderPayment::getByOrderId($order);
+        foreach ($ordersToProcess as $orderId) {
+            $order = new Order($orderId);
+            if (_PS_VERSION_ >= '8') {
+                $orderPayments = $order->getOrderPayments();
+            } else {
+                $orderPayments = OrderPayment::getByOrderId($orderId);
+            }
             $transactionId = $orderPayments[0]->transaction_id;
             if (empty($transactionId)) {
                 continue;
             }
             $payment = \SatispayGBusiness\Payment::get($transactionId);
             $orderId = Order::getOrderByCartId($payment->metadata->cart_id);
-            $order = new Order($orderId);
 
             if ($order->current_state == (int)(Configuration::get('SATISPAY_PENDING_STATE'))) {
                 $history = new OrderHistory();

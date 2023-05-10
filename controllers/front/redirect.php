@@ -34,7 +34,11 @@ class SatispayRedirectModuleFrontController extends ModuleFrontController
         $paymentId = null;
         if ($customerOrders) {
             $lastOrder = new Order((int) $customerOrders[0]['id_order']);
-            $orderPayments = OrderPayment::getByOrderId($lastOrder->id);
+            if (_PS_VERSION_ >= '8') {
+                $orderPayments = $lastOrder->getOrderPayments();
+            } else {
+                $orderPayments = OrderPayment::getByOrderId($lastOrder->id);
+            }
             $paymentId = $orderPayments[0]->transaction_id;
         }
         if (empty($paymentId)) {
