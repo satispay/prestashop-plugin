@@ -133,7 +133,7 @@ class Satispay extends PaymentModule
             }
             $order_state->invoice = false;
             $order_state->send_email = false;
-            $order_state->logable = true;
+            $order_state->logable = false;         //true - check to see if we can deflag the status_option (Considera come Validato)
             $order_state->color = '#EF5350';
             $order_state->module_name = $this->name;
             $order_state->add();
