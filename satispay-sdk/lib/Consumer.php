@@ -28,6 +28,7 @@ namespace SatispayGBusiness;
 
 if (!defined('PS_VERSION')) { exit; } 
 
+
 class Consumer {
   private static $apiPath = "/g_business/v1/consumers";
 

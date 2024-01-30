@@ -23,10 +23,10 @@
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
+if (!defined('PS_VERSION')) { exit; } 
+
 
 require_once(dirname(__FILE__).'/satispay-sdk/init.php');
-
-if (!defined('PS_VERSION')) { exit; } 
 
 class Satispay extends PaymentModule
 {
