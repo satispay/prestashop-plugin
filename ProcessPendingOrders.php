@@ -24,9 +24,7 @@
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
-if (!defined('_PS_VERSION_')) {
-    exit;
-}
+if (!defined('PS_VERSION')) { exit; } 
 
 class ProcessPendingOrders
 {

@@ -26,6 +26,8 @@
 
 namespace SatispayGBusiness;
 
+if (!defined('PS_VERSION')) { exit; } 
+
 class Request {
   private static $userAgentName = "SatispayGBusinessApiPhpSdk";
 
