@@ -1,3 +1,14 @@
-# Write inside the two lines the contect of the .htaccess file
+# Apache 2.2
+<IfModule !mod_authz_core.c>
+   <Files *.php>
+   order allow,deny
+   deny from all
+   </Files>
+</IfModule>
 
-# End of file 
+# Apache 2.4
+<IfModule mod_authz_core.c>
+   <Files *.php>
+   Require all denied
+   </Files>
+</IfModule>
