@@ -1,5 +1,5 @@
 <?php
-
+if (!defined('PS_VERSION')) { exit; } 
 global $_MODULE;
 $_MODULE = array();
 $_MODULE['<{satispay}prestashop>satispay_86367103eed16b879a9d5128c99f97a4'] = 'Satispay';

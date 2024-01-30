@@ -26,9 +26,7 @@
 
 require_once(dirname(__FILE__).'/satispay-sdk/init.php');
 
-if (!defined('_PS_VERSION_')) {
-    exit;
-}
+if (!defined('PS_VERSION')) { exit; } 
 
 class Satispay extends PaymentModule
 {
