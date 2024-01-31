@@ -132,7 +132,7 @@ class Satispay extends PaymentModule
             }
             $order_state->invoice = false;
             $order_state->send_email = false;
-            $order_state->logable = false;     
+            $order_state->logable = true;     
             $order_state->color = '#EF5350';
             $order_state->module_name = $this->name;
             $order_state->add();
