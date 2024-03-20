@@ -112,36 +112,47 @@ class Satispay extends PaymentModule
      * Create order state
      * @return boolean
      */
-    public function installOrderState()
-    {
-        /* Create Order State for Satispay */
-        if (!Configuration::get(self::SATISPAY_PENDING_STATE)
-            || !Validate::isLoadedObject(new OrderState(Configuration::get(self::SATISPAY_PENDING_STATE)))) {
-            $order_state = new OrderState();
-            $order_state->name = array();
-            foreach (Language::getLanguages() as $language) {
-                switch (Tools::strtolower($language['iso_code'])) {
-                    case 'it':
-                        $order_state->name[$language['id_lang']] = pSQL('In attesa di pagamento con Satispay');
-                        break;
+public function installOrderState(){
 
-                    default:
-                        $order_state->name[$language['id_lang']] = pSQL('Waiting for Satispay payment');
-                        break;
-                }
+    $existingState = OrderState::getOrderStates((int)Context::getContext()->language->id);
+    $orderStateExists = false;
+
+    foreach ($existingState as $state) {
+        if ($state['name'] == 'Waiting for Satispay payment' || $state['name'] == 'In attesa di pagamento con Satispay') {
+            $orderStateExists = true;
+            break;
+        }
+    }
+
+    if (!$orderStateExists) {
+        // Create the order state
+        $order_state = new OrderState();
+        $order_state->name = array();
+
+        foreach (Language::getLanguages() as $language) {
+            switch (Tools::strtolower($language['iso_code'])) {
+                case 'it':
+                    $order_state->name[$language['id_lang']] = pSQL('In attesa di pagamento con Satispay');
+                    break;
+                default:
+                    $order_state->name[$language['id_lang']] = pSQL('Waiting for Satispay payment');
+                    break;
             }
-            $order_state->invoice = false;
-            $order_state->send_email = false;
-            $order_state->logable = true;     
-            $order_state->color = '#EF5350';
-            $order_state->module_name = $this->name;
-            $order_state->add();
-
-            Configuration::updateValue(self::SATISPAY_PENDING_STATE, $order_state->id);
         }
 
-        return true;
+        $order_state->send_email = false;
+        $order_state->invoice = false;
+        $order_state->logable = true;
+        $order_state->color = '#EF5350';
+        $order_state->module_name = $this->name;
+        $order_state->add();
+
+        Configuration::updateValue(self::SATISPAY_PENDING_STATE, $order_state->id);
     }
+
+    return true;
+}
+
 
     /**
      * Load the configuration form
