@@ -44,7 +44,7 @@ class Satispay extends PaymentModule
     {
         $this->name = 'satispay';
         $this->tab = 'payments_gateways';
-        $this->version = '2.4.1';
+        $this->version = '2.4.2';
         $this->author = 'Satispay';
         $this->need_instance = 1;
         $this->module_key = '812ed8ea2509dd2146ef979a6af24ee5';
