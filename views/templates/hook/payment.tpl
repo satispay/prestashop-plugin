@@ -27,7 +27,7 @@
 	<div class="col-xs-12">
 		<p class="payment_module" id="satispay_payment_button">
 			<a href="{$link->getModuleLink('satispay', 'payment', array(), true)|escape:'htmlall':'UTF-8'}" title="{l s='Pay with Satispay' mod='satispay'}">
-				{* <img src="{$module_dir|escape:'htmlall':'UTF-8'}/views/img/payment_logo.png" alt="{l s='Pay with Satispay' mod='satispay'}" width="32" height="32" /> *}
+				{* <img src="{$module_dir|escape:'htmlall':'UTF-8'}/views/img/payment_logo.png" alt="{l s='Pay with Satispay' mod='satispay'}" width="20" height="20" /> *}
 				{l s='Pay with Satispay' mod='satispay'}
 			</a>
 		</p>
