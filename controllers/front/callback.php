@@ -43,12 +43,12 @@ class SatispayCallbackModuleFrontController extends ModuleFrontController
             if ($payment->status === 'ACCEPTED') {
                 //using existing payment so it's not doubled
                 $history->changeIdOrderState((int)(Configuration::get('PS_OS_PAYMENT')), $orderId, true);
-                $history->save();
+                $history->addWithemail();
             }
 
             if ($payment->status === 'CANCELED') {
                 $order->setCurrentState((int)(Configuration::get('PS_OS_CANCELED')));
-                $order->save();
+                $history->addWithemail();
             }
         }
         exit;

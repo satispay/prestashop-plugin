@@ -68,7 +68,7 @@ class ProcessPendingOrders
                     $orderMessage->private = true;
                     $orderMessage->save();
 
-                    $history->save();
+                    $history->addWithemail();
                 }
 
                 if ($payment->status === 'CANCELED') {

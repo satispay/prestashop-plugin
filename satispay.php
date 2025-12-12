@@ -84,8 +84,13 @@ class Satispay extends PaymentModule
             return false;
         }
 
-        if (!($this->registerHook('payment') &&
-            $this->registerHook('paymentOptions'))) {
+        if (
+            !(
+                $this->registerHook('payment') &&
+                $this->registerHook('paymentOptions') &&
+                $this->registerHook('actionEmailSendBefore')
+            )
+        ) {
             return false;
         }
 
@@ -104,6 +109,7 @@ class Satispay extends PaymentModule
         Configuration::deleteByName('SATISPAY_PRIVATE_KEY');
         Configuration::deleteByName('SATISPAY_PUBLIC_KEY');
         Configuration::deleteByName('SATISPAY_UNPROCESSED_TIME');
+        Configuration::deleteByName('SATISPAY_DISABLE_ORDER_CONFIRMATION');
 
         return parent::uninstall();
     }
@@ -305,6 +311,25 @@ public function installOrderState(){
                         'cast' => 'intval',
                         'defaultValue' => self::SATISPAY_DEFAULT_UNPROCESSED_TIME,
                         ),
+                    array(
+                        'type' => 'switch',
+                        'label' => $this->l('Disable order confirmation e-mail'),
+                        'name' => 'SATISPAY_DISABLE_ORDER_CONFIRMATION',
+                        'is_bool' => true,
+                        'desc' => $this->l('Disable sending order confirmation e-mail'),
+                        'values' => array(
+                            array(
+                                'id' => 'active_on',
+                                'value' => true,
+                                'label' => $this->l('Enabled')
+                            ),
+                            array(
+                                'id' => 'active_off',
+                                'value' => false,
+                                'label' => $this->l('Disabled')
+                            )
+                        ),
+                    ),
                 ),
                 'submit' => array(
                     'title' => $this->l('Save'),
@@ -319,6 +344,7 @@ public function installOrderState(){
             'SATISPAY_SANDBOX' => Configuration::get('SATISPAY_SANDBOX', false),
             'SATISPAY_ACTIVATION_CODE' => Configuration::get('SATISPAY_ACTIVATION_CODE', ''),
             'SATISPAY_UNPROCESSED_TIME' => (Configuration::get('SATISPAY_UNPROCESSED_TIME') ? Configuration::get('SATISPAY_UNPROCESSED_TIME') : self::SATISPAY_DEFAULT_UNPROCESSED_TIME),
+            'SATISPAY_DISABLE_ORDER_CONFIRMATION' => Configuration::get('SATISPAY_DISABLE_ORDER_CONFIRMATION'),
         );
     }
 
@@ -367,6 +393,7 @@ public function installOrderState(){
         $postedSandbox = Tools::getValue('SATISPAY_SANDBOX');
         $postedUnprocessedTime = Tools::getValue('SATISPAY_UNPROCESSED_TIME');
         $postedActivationCode = Tools::getValue('SATISPAY_ACTIVATION_CODE');
+        $postDisableOrderConfirmation = Tools::getValue('SATISPAY_DISABLE_ORDER_CONFIRMATION');
 
         $currentActivationCode = Configuration::get('SATISPAY_ACTIVATION_CODE', '');
 
@@ -378,6 +405,7 @@ public function installOrderState(){
         }
         Configuration::updateValue('SATISPAY_UNPROCESSED_TIME', $postedUnprocessedTime);
         Configuration::updateValue('SATISPAY_SANDBOX', $postedSandbox);
+        Configuration::updateValue('SATISPAY_DISABLE_ORDER_CONFIRMATION', $postDisableOrderConfirmation);
 
         if ($postedActivationCode != $currentActivationCode) {
             if ($postedSandbox == '1') {
@@ -473,5 +501,19 @@ public function installOrderState(){
             ->setLogo(Media::getMediaPath(_PS_MODULE_DIR_.$this->name.'/views/img/payment_logo.png'));
 
         return array($paymentOption);
+    }
+
+    public function hookActionEmailSendBefore($params)
+    {
+        if (
+            $params['template'] === 'order_conf' &&
+            Configuration::get('SATISPAY_DISABLE_ORDER_CONFIRMATION')
+        ) {
+            $order = Order::getByCartId($params['cart']->id);
+            if ($order->module === $this->name) {
+                return false;
+            }
+        }
+        return true;
     }
 }
