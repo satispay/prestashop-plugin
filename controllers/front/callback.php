@@ -48,7 +48,7 @@ class SatispayCallbackModuleFrontController extends ModuleFrontController
 
             if ($payment->status === 'CANCELED') {
                 $order->setCurrentState((int)(Configuration::get('PS_OS_CANCELED')));
-                $history->addWithemail();
+                $order->save();
             }
         }
         exit;
