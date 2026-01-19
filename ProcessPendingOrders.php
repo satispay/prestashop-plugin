@@ -52,7 +52,7 @@ class ProcessPendingOrders
                 continue;
             }
             $payment = \SatispayGBusiness\Payment::get($transactionId);
-            $orderId = Order::getOrderByCartId($payment->metadata->cart_id);
+            $orderId = Order::getIdByCartId($payment->metadata->cart_id);
 
             if ($order->current_state == (int)(Configuration::get('SATISPAY_PENDING_STATE'))) {
                 $history = new OrderHistory();

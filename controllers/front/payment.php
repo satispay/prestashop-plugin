@@ -42,7 +42,7 @@ class SatispayPaymentModuleFrontController extends ModuleFrontController
         $this->module->validateOrder($cart->id, (int)(Configuration::get('SATISPAY_PENDING_STATE')), $amountUnit / 100, $this->module->displayName, null, array(
             ), $currency->id, false, $customer->secure_key);
 
-        $orderId = Order::getOrderByCartId((int)($cart->id));
+        $orderId = Order::getIdByCartId((int)($cart->id));
         $order = new Order($orderId);
 
         $redirectUrl = urldecode($this->context->link->getModuleLink(

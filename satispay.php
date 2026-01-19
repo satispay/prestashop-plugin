@@ -39,6 +39,7 @@ class Satispay extends PaymentModule
     const SATISPAY_DEFAULT_UNPROCESSED_TIME = 4;
 
     protected $config_form = false;
+    protected $limited_currencies = array();
 
     public function __construct()
     {

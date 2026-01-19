@@ -54,7 +54,7 @@ class SatispayRedirectModuleFrontController extends ModuleFrontController
 
         if ($payment->status === 'ACCEPTED') {
             for ($i = 0; $i < 6; $i++) {
-                $orderId = Order::getOrderByCartId($payment->metadata->cart_id);
+                $orderId = Order::getIdByCartId($payment->metadata->cart_id);
                 $order = new Order($orderId);
 
                 if (!empty($order->id)) {
@@ -90,7 +90,7 @@ class SatispayRedirectModuleFrontController extends ModuleFrontController
                 $this->context->cookie->write();
             }
 
-            $orderId = Order::getOrderByCartId($payment->metadata->cart_id);
+            $orderId = Order::getIdByCartId($payment->metadata->cart_id);
             $order = new Order($orderId);
             $order->setCurrentState((int)(Configuration::get('PS_OS_CANCELED')));
             $order->save();

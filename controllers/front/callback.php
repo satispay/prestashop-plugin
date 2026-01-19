@@ -33,7 +33,7 @@ class SatispayCallbackModuleFrontController extends ModuleFrontController
     {
         $paymentId = Tools::getValue('payment_id');
         $payment = \SatispayGBusiness\Payment::get($paymentId);
-        $orderId = Order::getOrderByCartId($payment->metadata->cart_id);
+        $orderId = Order::getIdByCartId($payment->metadata->cart_id);
         $order = new Order($orderId);
 
         if ($order->current_state == (int)(Configuration::get('SATISPAY_PENDING_STATE'))) {
