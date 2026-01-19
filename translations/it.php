@@ -6,7 +6,7 @@ if (!defined('_PS_VERSION_')) {
 global $_MODULE;
 $_MODULE = array();
 $_MODULE['<{satispay}prestashop>satispay_86367103eed16b879a9d5128c99f97a4'] = 'Satispay';
-$_MODULE['<{satispay}prestashop>satispay_ca005cfc9e4e432fcd61dedc6f2f3780'] = 'Risparmia tempo e denaro ricevendo pagamenti dai tuoi clienti con Satispay. Gratuita, semplice, sicura. #doitsmart';
+$_MODULE['<{satispay}prestashop>satispay_ca005cfc9e4e432fcd61dedc6f2f3780'] = 'People paying people.';
 $_MODULE['<{satispay}prestashop>satispay_d1d3e5571e7f010a231d8ed48578e53e'] = 'Satispay non è configurato correttamente, genera un Codice di Attivazione dalla sezione Negozi Online della %sDashboard Satispay%s.';
 $_MODULE['<{satispay}prestashop>satispay_f4f70727dc34561dfde1a3c529b6205c'] = 'Impostazioni';
 $_MODULE['<{satispay}prestashop>satispay_6a122e5c7cb7d36caaef7457e1f6034d'] = 'Codice di Attivazione';

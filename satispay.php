@@ -54,7 +54,7 @@ class Satispay extends PaymentModule
         parent::__construct();
 
         $this->displayName = $this->l('Satispay');
-        $this->description = $this->l('Save time and money by accepting payments from your customers with Satispay. Free, simple, secure! #doitsmart');
+        $this->description = $this->l('People paying people.');
         $this->limited_currencies = array('EUR');
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
 
