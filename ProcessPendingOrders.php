@@ -85,10 +85,10 @@ class ProcessPendingOrders
     {
         $module = \Module::getInstanceByName('satispay');
 
-        $currentSandbox = Configuration::get('SATISPAY_SANDBOX', false);
-        $currentKeyId = Configuration::get('SATISPAY_KEY_ID', '');
-        $currentPrivateKey = Configuration::get('SATISPAY_PRIVATE_KEY', '');
-        $currentPublicKey = Configuration::get('SATISPAY_PUBLIC_KEY', '');
+        $currentSandbox = Configuration::get('SATISPAY_SANDBOX');
+        $currentKeyId = Configuration::get('SATISPAY_KEY_ID') ?? '';
+        $currentPrivateKey = Configuration::get('SATISPAY_PRIVATE_KEY') ?? '';
+        $currentPublicKey = Configuration::get('SATISPAY_PUBLIC_KEY') ?? '';
 
         \SatispayGBusiness\Api::setSandbox($currentSandbox);
         \SatispayGBusiness\Api::setKeyId($currentKeyId);

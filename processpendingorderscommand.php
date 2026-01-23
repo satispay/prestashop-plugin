@@ -31,4 +31,8 @@ require_once(dirname(__FILE__).'/satispay-sdk/lib/Request.php');
 require_once(dirname(__FILE__).'/satispay-sdk/lib/Api.php');
 require_once(dirname(__FILE__).'/../../init.php');
 
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
+
 $module = new ProcessPendingOrders();
