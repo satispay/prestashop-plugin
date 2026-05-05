@@ -63,10 +63,10 @@ class Satispay extends PaymentModule
 
     protected function loadConfiguration()
     {
-        $currentSandbox = Configuration::get('SATISPAY_SANDBOX', false);
-        $currentKeyId = Configuration::get('SATISPAY_KEY_ID', '');
-        $currentPrivateKey = Configuration::get('SATISPAY_PRIVATE_KEY', '');
-        $currentPublicKey = Configuration::get('SATISPAY_PUBLIC_KEY', '');
+        $currentSandbox = Configuration::get('SATISPAY_SANDBOX');
+        $currentKeyId = Configuration::get('SATISPAY_KEY_ID') ?? '';
+        $currentPrivateKey = Configuration::get('SATISPAY_PRIVATE_KEY') ?? '';
+        $currentPublicKey = Configuration::get('SATISPAY_PUBLIC_KEY') ?? '';
 
         \SatispayGBusiness\Api::setSandbox($currentSandbox);
         \SatispayGBusiness\Api::setKeyId($currentKeyId);
@@ -307,7 +307,7 @@ public function installOrderState(){
                         'type' => 'text',
                         'label' => $this->l('Finalize pending payments up to'),
                         'name' => 'SATISPAY_UNPROCESSED_TIME',
-                        'desc' => sprintf($this->l('Choose a number of hours, default is four and minimum is two.').'<br />'.$this->l('More details on our %sdocumentation%s.'), '<a href="http://developers.satispay.com/docs/prestashop" target="_blank">', '</a>'),
+                        'desc' => sprintf($this->l('Choose a number of hours, default is four and minimum is two.').'<br />'.$this->l('More details on our %sdocumentation%s.'), '<a href="https://developers.satispay.com/docs/prestashop" target="_blank">', '</a>'),
                         'validation' => 'isInt',
                         'cast' => 'intval',
                         'defaultValue' => self::SATISPAY_DEFAULT_UNPROCESSED_TIME,
@@ -342,8 +342,8 @@ public function installOrderState(){
     protected function getConfigFormValues()
     {
         return array(
-            'SATISPAY_SANDBOX' => Configuration::get('SATISPAY_SANDBOX', false),
-            'SATISPAY_ACTIVATION_CODE' => Configuration::get('SATISPAY_ACTIVATION_CODE', ''),
+            'SATISPAY_SANDBOX' => Configuration::get('SATISPAY_SANDBOX'),
+            'SATISPAY_ACTIVATION_CODE' => Configuration::get('SATISPAY_ACTIVATION_CODE') ?? '',
             'SATISPAY_UNPROCESSED_TIME' => (Configuration::get('SATISPAY_UNPROCESSED_TIME') ? Configuration::get('SATISPAY_UNPROCESSED_TIME') : self::SATISPAY_DEFAULT_UNPROCESSED_TIME),
             'SATISPAY_DISABLE_ORDER_CONFIRMATION' => Configuration::get('SATISPAY_DISABLE_ORDER_CONFIRMATION'),
         );
@@ -396,7 +396,7 @@ public function installOrderState(){
         $postedActivationCode = Tools::getValue('SATISPAY_ACTIVATION_CODE');
         $postDisableOrderConfirmation = Tools::getValue('SATISPAY_DISABLE_ORDER_CONFIRMATION');
 
-        $currentActivationCode = Configuration::get('SATISPAY_ACTIVATION_CODE', '');
+        $currentActivationCode = Configuration::get('SATISPAY_ACTIVATION_CODE') ?? '';
 
         if (!is_numeric($postedUnprocessedTime) || $postedUnprocessedTime < 2) {
             return array(
