@@ -1,6 +1,6 @@
 <?php
 /**
-* 2007-2024 PrestaShop
+* 2007-2026 PrestaShop
 *
 * NOTICE OF LICENSE
 *
@@ -56,7 +56,7 @@ class Satispay extends PaymentModule
         $this->displayName = $this->l('Satispay');
         $this->description = $this->l('People paying people.');
         $this->limited_currencies = array('EUR');
-        $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
+        $this->ps_versions_compliancy = array('min' => '1.7', 'max' => '9.99.99');
 
         $this->loadConfiguration();
     }
